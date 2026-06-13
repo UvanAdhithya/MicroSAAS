@@ -340,15 +340,15 @@ export default function HomePage() {
   return (
     <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
       {/* ── Hero ── */}
-      <div style={{ paddingTop: 56, paddingBottom: 40, borderBottom: "1px solid var(--border)" }}>
-        <p style={{ fontSize: 12, fontFamily: "var(--mono)", color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 14 }}>
+      <div style={{ paddingTop: 80, paddingBottom: 72, borderBottom: "1px solid var(--border)", textAlign: "center", minHeight: "45vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ fontSize: 14, fontFamily: "var(--mono)", color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20 }}>
           Free tools
         </p>
-        <h1 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08, color: "var(--text)", margin: "0 0 14px", maxWidth: 560 }}>
-          Developer utilities<br />
+        <h1 style={{ fontSize: "clamp(36px,6vw,64px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08, color: "var(--text)", margin: "0 auto 20px", maxWidth: 720 }}>
+          Free Developer utilities<br />
           <span style={{ color: "var(--accent-fg)" }}>that respect your time.</span>
         </h1>
-        <p style={{ fontSize: 16, color: "var(--text-2)", lineHeight: 1.6, maxWidth: 440, margin: 0 }}>
+        <p style={{ fontSize: 18, color: "var(--text-2)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
           {tools.length} tools. No login. No ads. Everything runs in your browser.
         </p>
       </div>

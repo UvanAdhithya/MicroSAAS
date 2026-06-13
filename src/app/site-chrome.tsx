@@ -11,14 +11,14 @@ export function SiteHeader() {
     }}>
       <div style={{
         maxWidth: 1160, margin: "0 auto", padding: "0 24px",
-        height: 56, display: "flex", alignItems: "center", justifyContent: "space-between",
+        height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <a href="/" className="nav-logo">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <svg width="34" height="34" viewBox="0 0 28 28" fill="none">
             <rect width="28" height="28" rx="7" fill="var(--accent)"/>
             <path d="M9 10L5.5 14L9 18M19 10L22.5 14L19 18M15.5 8L12.5 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em" }}>
+          <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-0.02em" }}>
             dev<span style={{ color: "var(--accent-fg)" }}>tools</span>
           </span>
         </a>
