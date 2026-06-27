@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface ExtractedUrl {
   url: string;
@@ -64,6 +65,19 @@ export default function SitemapExtractorPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12 md:py-20">
+      {/* Breadcrumbs */}
+      <nav className="mb-8 flex w-fit items-center space-x-3 rounded-lg bg-[var(--bg-subtle)] px-4 py-2.5 text-[14px] font-medium text-[var(--text-2)]">
+        <Link href="/" className="hover:text-[var(--accent)] transition-colors">Home</Link>
+        <svg className="h-3.5 w-3.5 text-[var(--text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <span>Tools</span>
+        <svg className="h-3.5 w-3.5 text-[var(--text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="text-[var(--text)]">Sitemap URL Extractor</span>
+      </nav>
+
       <div className="mb-10 text-center">
         <h1 className="mb-4 text-3xl font-bold tracking-tight text-[var(--text)] sm:text-4xl">
           Sitemap & URL Extractor

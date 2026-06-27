@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${mono.variable}`} style={{ fontFamily: "var(--sans)" }}>
+      <body className={`${inter.variable} ${mono.variable}`} style={{ fontFamily: "var(--sans)" }} suppressHydrationWarning>
         <a href="#main" className="skip-nav">Skip to content</a>
         <SiteHeader />
         <main id="main">{children}</main>
