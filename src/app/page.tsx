@@ -279,6 +279,24 @@ function CronWidget() {
   );
 }
 
+function SitemapWidget() {
+  const [url, setUrl] = useState("https://example.com");
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+        <input suppressHydrationWarning value={url} onChange={e => setUrl(e.target.value)}
+          style={{ flex: 1, fontSize: 12, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text)", outline: "none" }} />
+        <button style={{ fontSize: 12, fontWeight: 600, color: "white", background: "var(--accent)", border: "none", borderRadius: 6, padding: "0 12px", cursor: "pointer" }}>
+          Crawl
+        </button>
+      </div>
+      <div style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--text-3)", padding: "8px", background: "var(--bg-subtle)", border: "1px dashed var(--border)", borderRadius: 6, textAlign: "center" }}>
+        Extracts all public links<br/>from robots.txt & sitemaps
+      </div>
+    </WidgetShell>
+  );
+}
+
 /* ─── Shared widget shell ──────────────────────────── */
 function WidgetShell({ children }: { children: React.ReactNode }) {
   return (
@@ -303,6 +321,7 @@ const tools: Tool[] = [
   { slug: "diff-viewer", name: "Text Diff", description: "Side-by-side or inline diff of any two text blocks. Word and character-level modes.", category: "text", badge: "new", Widget: DiffWidget },
   { slug: "url-encoder", name: "URL Encoder", description: "Percent-encode or decode URL components. Handles all special characters correctly.", category: "encoding", Widget: UrlWidget },
   { slug: "cron-parser", name: "Cron Parser", description: "Translate cron expressions to plain English and preview the next 10 scheduled runs.", category: "data", Widget: CronWidget },
+  { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
 ];
 
 const CATEGORIES: { id: Category; label: string }[] = [

@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "diff-viewer",
     "url-encoder",
     "cron-parser",
+    "sitemap-extractor",
   ];
 
   const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
