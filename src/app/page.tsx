@@ -348,7 +348,7 @@ export default function HomePage() {
           Free Developer utilities<br />
           <span style={{ color: "var(--accent-fg)" }}>that respect your time.</span>
         </h1>
-        <p style={{ fontSize: 18, color: "var(--text-2)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
+        <p style={{ fontSize: 18, color: "var(--text-2  )", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
           {tools.length} tools. No login. No ads. Everything runs in your browser.
         </p>
       </div>
@@ -456,7 +456,7 @@ function ToolCard({ tool }: { tool: Tool }) {
         textDecoration: "none", transition: "opacity 0.15s",
         opacity: hovered ? 1 : 0.88,
       }}>
-        Open tool
+        Try tool
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
