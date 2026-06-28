@@ -170,6 +170,120 @@ export default function SitemapExtractorPage() {
           </div>
         </div>
       )}
+
+      {/* ── Decorative divider ── */}
+      <div className="my-16 flex items-center gap-4">
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+        <svg className="h-5 w-5 text-[var(--text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+        </svg>
+        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--border)] to-transparent" />
+      </div>
+
+      {/* ── SEO Content Section ── */}
+      <article className="prose-custom mx-auto max-w-3xl pb-20">
+
+        <h2 className="mb-4 text-2xl font-bold tracking-tight text-[var(--text)]">
+          How to Generate a Sitemap from a URL
+        </h2>
+        <p className="mb-4 leading-relaxed text-[var(--text-2)]">
+          Generating a sitemap from a URL is one of the most fundamental tasks in technical SEO and
+          website auditing. A sitemap is essentially a structured list of every publicly accessible
+          page on a website, formatted so that search engines can discover and index content
+          efficiently. The process typically begins by fetching the site&apos;s{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">robots.txt</code>{" "}
+          file, which often contains a direct reference to one or more XML sitemap files. If no
+          sitemap directive is found, crawlers fall back to the conventional path at{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">/sitemap.xml</code>.
+        </p>
+        <p className="mb-4 leading-relaxed text-[var(--text-2)]">
+          Once the sitemap XML is retrieved, a parser reads through the structured tags —{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">&lt;urlset&gt;</code>,{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">&lt;url&gt;</code>,{" "}
+          and{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">&lt;loc&gt;</code>{" "}
+          — to extract every listed URL along with optional metadata like the last modification
+          date, change frequency, and priority. Larger websites often use a{" "}
+          <strong className="text-[var(--text)]">sitemap index</strong>, which acts as a table of
+          contents pointing to multiple smaller sitemaps, each covering a specific section of the
+          site such as blog posts, product pages, or documentation.
+        </p>
+
+        <h2 className="mb-4 mt-10 text-2xl font-bold tracking-tight text-[var(--text)]">
+          Why XML Sitemaps Matter for SEO
+        </h2>
+        <p className="mb-4 leading-relaxed text-[var(--text-2)]">
+          Search engines like Google, Bing, and Yandex rely heavily on XML sitemaps to understand the
+          full scope of a website. Without a sitemap, a search engine bot must discover pages solely
+          through internal links — a process that can miss orphaned pages, newly published content,
+          or deeply nested URLs that sit more than three clicks from the homepage.
+        </p>
+
+        <h3 className="mb-3 mt-6 text-lg font-semibold text-[var(--text)]">
+          Key Benefits of Maintaining an XML Sitemap
+        </h3>
+        <ul className="mb-6 list-none space-y-3 pl-0">
+          {[
+            { title: "Faster indexing", desc: "New pages are discovered within hours instead of days or weeks." },
+            { title: "Crawl budget efficiency", desc: "Search bots spend less time discovering pages and more time evaluating content quality." },
+            { title: "Metadata signals", desc: "The lastmod tag tells search engines which pages have been recently updated, prompting a re-crawl." },
+            { title: "Error detection", desc: "Comparing your sitemap against your live site reveals broken links, redirect chains, and missing pages." },
+          ].map((item) => (
+            <li key={item.title} className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-raised)] px-4 py-3">
+              <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--green)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-[var(--text-2)]">
+                <strong className="text-[var(--text)]">{item.title}.</strong> {item.desc}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mb-4 leading-relaxed text-[var(--text-2)]">
+          For websites with thousands of pages — e-commerce stores, news outlets, or documentation
+          portals — an up-to-date sitemap is not optional; it is critical infrastructure. Regular
+          sitemap audits ensure that search engines always have an accurate picture of your site&apos;s
+          content architecture.
+        </p>
+
+        <h2 className="mb-4 mt-10 text-2xl font-bold tracking-tight text-[var(--text)]">
+          How Our Free Crawler Works
+        </h2>
+        <p className="mb-4 leading-relaxed text-[var(--text-2)]">
+          Our Sitemap &amp; URL Extractor runs entirely on edge infrastructure, which means every
+          request is handled by a serverless function deployed close to your geographic location for
+          minimal latency. When you enter a domain and click <strong className="text-[var(--text)]">Extract URLs</strong>,
+          the following happens behind the scenes:
+        </p>
+        <ol className="mb-6 list-none space-y-3 pl-0">
+          {[
+            "We fetch the target domain\u2019s robots.txt file to look for declared Sitemap: directives.",
+            "If no sitemap is declared, we fall back to the standard /sitemap.xml path.",
+            "The retrieved XML is parsed using a robust, spec-compliant parser that handles both urlset and sitemapindex formats.",
+            "All discovered URLs and their metadata are returned to your browser instantly — nothing is stored on our servers.",
+          ].map((step, i) => (
+            <li key={i} className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-raised)] px-4 py-3">
+              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">
+                {i + 1}
+              </span>
+              <span className="text-[var(--text-2)]">{step}</span>
+            </li>
+          ))}
+        </ol>
+
+        <h3 className="mb-3 mt-6 text-lg font-semibold text-[var(--text)]">
+          Privacy &amp; Transparency
+        </h3>
+        <p className="leading-relaxed text-[var(--text-2)]">
+          Your data never leaves the pipeline between your browser and the target website. We do not
+          log, cache, or store the URLs you extract. The CSV export is generated entirely client-side
+          using the{" "}
+          <code className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-[13px] font-medium text-[var(--accent)]">Blob</code>{" "}
+          API, so the file is created in your browser&apos;s memory and downloaded directly to your
+          device. This tool is free, requires no sign-up, and will always remain open for developers,
+          SEO professionals, and content teams who need a quick, reliable sitemap audit.
+        </p>
+      </article>
     </div>
   );
 }
