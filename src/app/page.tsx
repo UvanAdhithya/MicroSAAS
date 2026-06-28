@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 /* ─── Types ─────────────────────────────────────────── */
-type Category = "all" | "data" | "text" | "encoding" | "security" | "generators" | "design";
+type Category = "all" | "seo" | "data" | "text" | "encoding" | "security" | "generators" | "design";
 
 type Tool = {
   slug: string;
@@ -279,6 +279,24 @@ function CronWidget() {
   );
 }
 
+function SeoAnalyzerWidget() {
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, fontSize: 11, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com</div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 10px" }}>Analyze</div>
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, padding: "6px 8px", fontSize: 10, borderRadius: 6, background: "var(--green-light)", color: "var(--green)", fontWeight: 600, textAlign: "center" }}>Title ✓</div>
+          <div style={{ flex: 1, padding: "6px 8px", fontSize: 10, borderRadius: 6, background: "var(--green-light)", color: "var(--green)", fontWeight: 600, textAlign: "center" }}>Meta ✓</div>
+          <div style={{ flex: 1, padding: "6px 8px", fontSize: 10, borderRadius: 6, background: "var(--amber-light)", color: "var(--amber)", fontWeight: 600, textAlign: "center" }}>OG ⚠</div>
+        </div>
+      </div>
+    </WidgetShell>
+  );
+}
+
 function SitemapWidget() {
   const [url, setUrl] = useState("https://example.com");
   return (
@@ -311,6 +329,7 @@ function WidgetShell({ children }: { children: React.ReactNode }) {
 
 /* ─── Tool list ──────────────────────────────────────── */
 const tools: Tool[] = [
+  { slug: "seo-analyzer", name: "SEO Analyzer", description: "Instantly audit any page's title, meta tags, OpenGraph data, headings, and see a live Google SERP preview.", category: "seo", badge: "new", Widget: SeoAnalyzerWidget },
   { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
   { slug: "json-formatter", name: "JSON Formatter", description: "Validate, pretty-print, and minify JSON. Pinpoints syntax errors with line numbers.", category: "data", badge: "popular", Widget: JsonWidget },
   { slug: "regex-tester", name: "Regex Tester", description: "Live regex matching with per-match highlights. Supports JS, Python, and PCRE flavors.", category: "text", badge: "popular", Widget: RegexWidget },
@@ -326,6 +345,7 @@ const tools: Tool[] = [
 
 const CATEGORIES: { id: Category; label: string }[] = [
   { id: "all", label: "All" },
+  { id: "seo", label: "SEO" },
   { id: "data", label: "Data" },
   { id: "text", label: "Text" },
   { id: "encoding", label: "Encoding" },
@@ -335,7 +355,7 @@ const CATEGORIES: { id: Category; label: string }[] = [
 ];
 
 const CAT_COLOR: Record<string, string> = {
-  data: "#D97706", text: "#2563EB", encoding: "#7C3AED",
+  seo: "#0891B2", data: "#D97706", text: "#2563EB", encoding: "#7C3AED",
   security: "#DC2626", generators: "#16A34A", design: "#DB2777",
 };
 
