@@ -15,8 +15,8 @@ export function SiteHeader() {
       }}>
         <a href="/" className="nav-logo">
           <svg width="34" height="34" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="7" fill="var(--accent)"/>
-            <path d="M9 10L5.5 14L9 18M19 10L22.5 14L19 18M15.5 8L12.5 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect width="28" height="28" rx="7" fill="var(--accent)" />
+            <path d="M9 10L5.5 14L9 18M19 10L22.5 14L19 18M15.5 8L12.5 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-0.02em" }}>
             dev<span style={{ color: "var(--accent-fg)" }}>tools</span>
@@ -25,7 +25,7 @@ export function SiteHeader() {
 
         <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
           <a href="/" className="nav-link">All Tools</a>
-          <a href="https://github.com" className="nav-link">GitHub</a>
+          <a href="https://github.com/UvanAdhithya/MicroSAAS" className="nav-link">GitHub</a>
           <a href="/try" className="nav-cta">Try free</a>
         </nav>
       </div>

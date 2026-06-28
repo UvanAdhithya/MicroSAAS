@@ -6,7 +6,7 @@ import type { MetadataRoute } from "next";
  * internal routes that shouldn't be indexed.
  */
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devtools-hub.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devtools-lilac-nine.vercel.app";
 
   return {
     rules: [
