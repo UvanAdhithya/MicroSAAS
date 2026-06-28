@@ -311,6 +311,7 @@ function WidgetShell({ children }: { children: React.ReactNode }) {
 
 /* ─── Tool list ──────────────────────────────────────── */
 const tools: Tool[] = [
+  { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
   { slug: "json-formatter", name: "JSON Formatter", description: "Validate, pretty-print, and minify JSON. Pinpoints syntax errors with line numbers.", category: "data", badge: "popular", Widget: JsonWidget },
   { slug: "regex-tester", name: "Regex Tester", description: "Live regex matching with per-match highlights. Supports JS, Python, and PCRE flavors.", category: "text", badge: "popular", Widget: RegexWidget },
   { slug: "base64", name: "Base64 Encode / Decode", description: "Encode strings and binary files to Base64, or decode them back instantly.", category: "encoding", Widget: Base64Widget },
@@ -321,7 +322,6 @@ const tools: Tool[] = [
   { slug: "diff-viewer", name: "Text Diff", description: "Side-by-side or inline diff of any two text blocks. Word and character-level modes.", category: "text", badge: "new", Widget: DiffWidget },
   { slug: "url-encoder", name: "URL Encoder", description: "Percent-encode or decode URL components. Handles all special characters correctly.", category: "encoding", Widget: UrlWidget },
   { slug: "cron-parser", name: "Cron Parser", description: "Translate cron expressions to plain English and preview the next 10 scheduled runs.", category: "data", Widget: CronWidget },
-  { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
 ];
 
 const CATEGORIES: { id: Category; label: string }[] = [
