@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteHeader, SiteFooter } from "./site-chrome";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
-const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--font-mono", weight: ["400","500"] });
+const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--font-mono", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   title: { template: "%s — DevTools", default: "DevTools — Free developer utilities" },
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   openGraph: { type: "website", siteName: "DevTools" },
   robots: { index: true, follow: true },
+  verification: { google: "c8NVcS7u1cw86D3xvzzAzknlPPjb4zUZJa-9jXO2cic" },
 };
 
 export const viewport: Viewport = {
