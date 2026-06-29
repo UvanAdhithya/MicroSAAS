@@ -68,6 +68,24 @@ function BrokenLinkWidget() {
   );
 }
 
+function ContentExtractorWidget() {
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, fontSize: 11, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com/blog</div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 10px" }}>Extract</div>
+        </div>
+        <div style={{ padding: "8px", fontSize: 10, borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-2)", fontFamily: "var(--mono)", border: "1px dashed var(--border)" }}>
+          <div style={{ color: "var(--text)" }}>H1: Title</div>
+          <div style={{ marginLeft: 8 }}>H2: Section</div>
+          <div style={{ marginLeft: 16 }}>H3: Subsection</div>
+        </div>
+      </div>
+    </WidgetShell>
+  );
+}
+
 /* ─── Shared widget shell ──────────────────────────── */
 function WidgetShell({ children }: { children: React.ReactNode }) {
   return (
@@ -83,6 +101,7 @@ function WidgetShell({ children }: { children: React.ReactNode }) {
 /* ─── Tool list ──────────────────────────────────────── */
 const tools: Tool[] = [
   { slug: "seo-analyzer", name: "SEO Analyzer", description: "Instantly audit any page's title, meta tags, OpenGraph data, headings, and see a live Google SERP preview.", category: "seo", badge: "new", Widget: SeoAnalyzerWidget },
+  { slug: "content-extractor", name: "Content Extractor", description: "Extract heading outlines (H1-H3) and calculate word counts to reverse-engineer competitor content.", category: "data", badge: "new", Widget: ContentExtractorWidget },
   { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
   { slug: "broken-link-checker", name: "Broken Link Checker", description: "Scan any page to find dead links. Checks every href and shows HTTP status codes with export.", category: "audit", badge: "new", Widget: BrokenLinkWidget },
 ];
