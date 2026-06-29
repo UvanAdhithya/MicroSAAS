@@ -2,11 +2,10 @@ import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 
 /* ─────────────────────────────────────────────────────────
- * Content Extractor — Edge API Route
+ * Free SEO Report — Edge API Route
  * ─────────────────────────────────────────────────────────
- * Fetches a target URL, extracts the document outline
- * (title + all H1/H2/H3 tags in DOM order) and calculates
- * a rough word count from the body text.
+ * Fetches a target URL and extracts key SEO metrics
+ * for the dashboard.
  * ───────────────────────────────────────────────────────── */
 
 export const runtime = "edge";
@@ -21,29 +20,22 @@ export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-/* ── Types ──────────────────────────────────────────────── */
-
-interface HeadingNode {
-  /** The heading level: 1, 2, or 3 */
-  level: number;
-  /** The text content of the heading */
-  text: string;
-}
-
-interface ContentResult {
+export interface SeoReportResult {
   url: string;
   title: string | null;
-  headings: HeadingNode[];
+  metaDescription: string | null;
+  ogImage: string | null;
+  h1Count: number;
+  h2Count: number;
+  linkCount: number;
   wordCount: number;
 }
-
-/* ── Browser-like headers ───────────────────────────────── */
 
 const fetchHeaders: Record<string, string> = {
   "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
   Accept:
-    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
   "Accept-Language": "en-US,en;q=0.9",
   "Accept-Encoding": "gzip, deflate, br",
   "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
@@ -55,8 +47,6 @@ const fetchHeaders: Record<string, string> = {
   "Sec-Fetch-User": "?1",
   "Upgrade-Insecure-Requests": "1",
 };
-
-/* ── Main handler ───────────────────────────────────────── */
 
 export async function POST(req: Request) {
   try {
@@ -118,40 +108,37 @@ export async function POST(req: Request) {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    // Extract title
     const title = $("title").first().text().trim() || null;
+    const metaDescription =
+      $('meta[name="description"]').attr("content")?.trim() || null;
+    const ogImage =
+      $('meta[property="og:image"]').attr("content")?.trim() ||
+      $('meta[name="og:image"]').attr("content")?.trim() ||
+      null;
 
-    // Extract headings in DOM order
-    // cheerio preserves DOM order when selecting multiple selectors
-    const headings: HeadingNode[] = [];
-    $("h1, h2, h3").each((_, el) => {
-      const node = el as any;
-      const tagName = (node.name || node.tagName || "").toLowerCase();
-      const level = parseInt(tagName.replace("h", ""), 10);
-      const text = $(el).text().trim();
-      if (text && headings.length < 100) {
-        headings.push({ level, text });
-      }
-    });
+    const h1Count = $("h1").length;
+    const h2Count = $("h2").length;
+    const linkCount = $("a").length;
 
-    // Calculate word count from body text
-    // Strip all tags, normalize whitespace, split by spaces
+    // Rough word count
     const bodyText = $("body").text() || "";
-    const cleanedText = bodyText
-      .replace(/\s+/g, " ")
-      .trim();
+    const cleanedText = bodyText.replace(/\s+/g, " ").trim();
     const wordCount = cleanedText ? cleanedText.split(" ").length : 0;
 
-    const result: ContentResult = {
+    const result: SeoReportResult = {
       url: parsedUrl.href,
       title,
-      headings,
+      metaDescription,
+      ogImage,
+      h1Count,
+      h2Count,
+      linkCount,
       wordCount,
     };
 
     return NextResponse.json(result, { headers: corsHeaders });
   } catch (error: any) {
-    console.error("Content extraction error:", error);
+    console.error("SEO Report extraction error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred." },
       { status: 500, headers: corsHeaders }
