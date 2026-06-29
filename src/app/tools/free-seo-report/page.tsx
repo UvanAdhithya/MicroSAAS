@@ -58,7 +58,7 @@ export default function FreeSeoReportPage() {
       const html2pdf = (await import("html2pdf.js")).default;
       
       const element = reportRef.current;
-      const opt = {
+      const opt: any = {
         margin: 10,
         filename: `SEO_Report_${new URL(result!.url).hostname}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
