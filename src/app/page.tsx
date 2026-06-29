@@ -86,6 +86,23 @@ function ContentExtractorWidget() {
   );
 }
 
+function FreeSeoReportWidget() {
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, fontSize: 11, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com</div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 10px" }}>Audit</div>
+        </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <div style={{ flex: 1, height: 4, borderRadius: 2, background: "var(--green)" }} />
+          <div style={{ fontSize: 10, fontWeight: 600, color: "var(--green)" }}>95/100</div>
+        </div>
+      </div>
+    </WidgetShell>
+  );
+}
+
 /* ─── Shared widget shell ──────────────────────────── */
 function WidgetShell({ children }: { children: React.ReactNode }) {
   return (
@@ -101,6 +118,7 @@ function WidgetShell({ children }: { children: React.ReactNode }) {
 /* ─── Tool list ──────────────────────────────────────── */
 const tools: Tool[] = [
   { slug: "seo-analyzer", name: "SEO Analyzer", description: "Instantly audit any page's title, meta tags, OpenGraph data, headings, and see a live Google SERP preview.", category: "seo", badge: "new", Widget: SeoAnalyzerWidget },
+  { slug: "free-seo-report", name: "Free SEO Report", description: "Generate a comprehensive technical SEO health dashboard and export it as a professional PDF.", category: "audit", badge: "new", Widget: FreeSeoReportWidget },
   { slug: "content-extractor", name: "Content Extractor", description: "Extract heading outlines (H1-H3) and calculate word counts to reverse-engineer competitor content.", category: "data", badge: "new", Widget: ContentExtractorWidget },
   { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
   { slug: "broken-link-checker", name: "Broken Link Checker", description: "Scan any page to find dead links. Checks every href and shows HTTP status codes with export.", category: "audit", badge: "new", Widget: BrokenLinkWidget },
