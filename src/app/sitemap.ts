@@ -5,7 +5,7 @@ import type { MetadataRoute } from "next";
  * Add new tool routes here as they're created.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devtools-hub.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devtools-lilac-nine.vercel.app";
   const now = new Date();
 
   // Static pages
