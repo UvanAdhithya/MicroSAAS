@@ -21,16 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Tool pages — add slugs here as tools are built
   const toolSlugs = [
     "seo-analyzer",
-    "json-formatter",
-    "regex-tester",
-    "base64",
-    "uuid-generator",
-    "jwt-debugger",
-    "hash-generator",
-    "color-converter",
-    "diff-viewer",
-    "url-encoder",
-    "cron-parser",
     "sitemap-extractor",
   ];
 
