@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 /* ─── Types ─────────────────────────────────────────── */
-type Category = "all" | "seo" | "data";
+type Category = "all" | "seo" | "data" | "audit";
 
 type Tool = {
   slug: string;
@@ -51,6 +51,23 @@ function SitemapWidget() {
   );
 }
 
+function BrokenLinkWidget() {
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, fontSize: 11, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com</div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 10px" }}>Scan</div>
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 2, padding: "5px 8px", fontSize: 10, borderRadius: 6, background: "var(--green-light)", color: "var(--green)", fontWeight: 600, textAlign: "center" }}>42 OK</div>
+          <div style={{ flex: 1, padding: "5px 8px", fontSize: 10, borderRadius: 6, background: "var(--red-light)", color: "var(--red)", fontWeight: 600, textAlign: "center" }}>3 Broken</div>
+        </div>
+      </div>
+    </WidgetShell>
+  );
+}
+
 /* ─── Shared widget shell ──────────────────────────── */
 function WidgetShell({ children }: { children: React.ReactNode }) {
   return (
@@ -67,16 +84,18 @@ function WidgetShell({ children }: { children: React.ReactNode }) {
 const tools: Tool[] = [
   { slug: "seo-analyzer", name: "SEO Analyzer", description: "Instantly audit any page's title, meta tags, OpenGraph data, headings, and see a live Google SERP preview.", category: "seo", badge: "new", Widget: SeoAnalyzerWidget },
   { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
+  { slug: "broken-link-checker", name: "Broken Link Checker", description: "Scan any page to find dead links. Checks every href and shows HTTP status codes with export.", category: "audit", badge: "new", Widget: BrokenLinkWidget },
 ];
 
 const CATEGORIES: { id: Category; label: string }[] = [
   { id: "all", label: "All" },
   { id: "seo", label: "SEO" },
   { id: "data", label: "Data" },
+  { id: "audit", label: "Audit" },
 ];
 
 const CAT_COLOR: Record<string, string> = {
-  seo: "#0891B2", data: "#D97706",
+  seo: "#0891B2", data: "#D97706", audit: "#DC2626",
 };
 
 /* ─── Page ───────────────────────────────────────────── */

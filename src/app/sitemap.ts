@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const toolSlugs = [
     "seo-analyzer",
     "sitemap-extractor",
+    "broken-link-checker",
   ];
 
   const toolPages: MetadataRoute.Sitemap = toolSlugs.map((slug) => ({
