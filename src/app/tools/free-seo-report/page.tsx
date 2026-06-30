@@ -167,6 +167,8 @@ export default function FreeSeoReportPage() {
           >
             <DashboardContent result={result} />
           </div>
+          
+          <UpsellCard />
         </div>
       )}
 
@@ -255,18 +257,6 @@ function DashboardContent({ result }: { result: SeoReportResult }) {
           <ProgressBar label="Total Links" value={result.linkCount} max={100} ideal={20} />
           <ProgressBar label="Word Count" value={result.wordCount} max={2000} ideal={500} suffix=" words" />
         </div>
-      </div>
-
-      {/* Embedded CTA for PDF Export Context */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 text-center shadow-sm">
-        <span className="mb-2 inline-block rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-          Agency Feature
-        </span>
-        <h4 className="mb-2 text-lg font-bold text-blue-900">Tired of manually generating these for clients?</h4>
-        <p className="text-sm text-blue-800">
-          Use <strong>Compy</strong> to automate weekly PDF SEO reports and email them directly to your stakeholders.
-          Sign up for early access today to streamline your agency workflow.
-        </p>
       </div>
     </div>
   );
@@ -401,5 +391,60 @@ function ContentSection() {
         </p>
       </article>
     </>
+  );
+}
+
+/* ── Upsell CTA Card ───────────────────────────────────── */
+
+function UpsellCard() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <div className="my-12 overflow-hidden rounded-2xl border border-[var(--accent)] bg-gradient-to-br from-[#EDE9FE] via-[#F5F3FF] to-[#FDF4FF] p-8 shadow-md sm:p-10">
+      <div className="mx-auto max-w-2xl text-center">
+        <span className="mb-3 inline-block rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+          Coming Soon
+        </span>
+        <h2 className="mb-3 text-2xl font-bold tracking-tight text-[var(--text)]">
+          Tired of manually generating these for clients?
+        </h2>
+        <p className="mb-6 text-[15px] leading-relaxed text-[var(--text-2)]">
+          Enter your email to have <strong className="text-[var(--accent)]">Compy</strong> automate weekly PDF SEO reports and email them directly to your stakeholders. Sign up for early access today to streamline your agency workflow.
+        </p>
+
+        {submitted ? (
+          <div className="inline-flex items-center gap-2 rounded-xl bg-[var(--green-light)] px-6 py-3 text-sm font-semibold text-[var(--green)]">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            You&apos;re on the list! We&apos;ll notify you when Compy launches.
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (email.trim()) setSubmitted(true);
+            }}
+            className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
+          >
+            <input
+              type="email"
+              required
+              placeholder="you@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-[var(--text)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <button
+              type="submit"
+              className="rounded-xl bg-[var(--accent)] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Notify Me
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }

@@ -138,7 +138,12 @@ export default function SeoAnalyzerPage() {
       {loading && <SkeletonDashboard />}
 
       {/* ── Results dashboard ── */}
-      {result && !loading && <ResultsDashboard result={result} />}
+      {result && !loading && (
+        <div className="mb-12 space-y-8">
+          <ResultsDashboard result={result} />
+          <UpsellCard />
+        </div>
+      )}
 
       {/* ── SEO content section ── */}
       <ContentSection />
@@ -525,7 +530,69 @@ function ContentSection() {
           directly back to your browser and rendered in the dashboard you see above. Your privacy
           is fully respected — we believe developer tools should be fast, free, and transparent.
         </p>
+        <p className="mt-4 leading-relaxed text-[var(--text-2)]">
+          For the best results, use this tool in conjunction with Google Search Console
+          and Google&apos;s Rich Results Testing Tool. By pairing our analyzer with these official resources, you build a comprehensive diagnostic workflow that catches everything from missing titles to invalid schema markup.
+        </p>
+        <UpsellCard />
       </article>
     </>
+  );
+}
+
+/* ── Upsell CTA Card ───────────────────────────────────── */
+
+function UpsellCard() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <div className="my-12 overflow-hidden rounded-2xl border border-[var(--accent)] bg-gradient-to-br from-[#EDE9FE] via-[#F5F3FF] to-[#FDF4FF] p-8 shadow-md sm:p-10">
+      <div className="mx-auto max-w-2xl text-center">
+        <span className="mb-3 inline-block rounded-full bg-[var(--accent)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
+          Coming Soon
+        </span>
+        <h2 className="mb-3 text-2xl font-bold tracking-tight text-[var(--text)]">
+          SEO isn&apos;t a one-and-done task.
+        </h2>
+        <p className="mb-6 text-[15px] leading-relaxed text-[var(--text-2)]">
+          Enter your email to have <strong className="text-[var(--accent)]">Compy</strong> monitor
+          your site in the background and alert you the second an important meta tag or heading drops.
+          Never lose organic traffic to a bad deployment again.
+        </p>
+
+        {submitted ? (
+          <div className="inline-flex items-center gap-2 rounded-xl bg-[var(--green-light)] px-6 py-3 text-sm font-semibold text-[var(--green)]">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            You&apos;re on the list! We&apos;ll notify you when Compy launches.
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (email.trim()) setSubmitted(true);
+            }}
+            className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
+          >
+            <input
+              type="email"
+              required
+              placeholder="you@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-[var(--text)] outline-none transition-colors focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <button
+              type="submit"
+              className="rounded-xl bg-[var(--accent)] px-6 py-3 font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Notify Me
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }
