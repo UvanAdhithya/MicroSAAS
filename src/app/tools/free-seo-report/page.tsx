@@ -54,22 +54,31 @@ export default function FreeSeoReportPage() {
     setDownloading(true);
 
     try {
-      // Dynamically import html2pdf to avoid SSR issues
-      const html2pdf = (await import("html2pdf.js")).default;
-      
-      const element = reportRef.current;
-      const opt: any = {
-        margin: 10,
-        filename: `SEO_Report_${new URL(result!.url).hostname}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
 
-      await html2pdf().set(opt).from(element).save();
-    } catch (err) {
+      const element = reportRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.98);
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`SEO_Report_${new URL(result!.url).hostname}.pdf`);
+    } catch (err: any) {
       console.error("PDF generation failed:", err);
-      alert("Failed to generate PDF. Check console for details.");
+      alert(`Failed to generate PDF. Error: ${err?.message || err}`);
     } finally {
       setDownloading(false);
     }
@@ -203,28 +212,28 @@ function DashboardContent({ result }: { result: SeoReportResult }) {
   const scoreColor = getScoreColor(score);
 
   return (
-    <div className="bg-white p-8 md:p-12 text-[#111827]">
+    <div className="bg-white p-8 md:p-12 text-[var(--text)]">
       {/* Dashboard Header */}
-      <div className="mb-10 flex flex-col items-center justify-between gap-8 border-b border-gray-200 pb-8 md:flex-row">
+      <div className="mb-10 flex flex-col items-center justify-between gap-8 border-b border-[var(--border)] pb-8 md:flex-row">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">SEO Health Report</h2>
-          <p className="mt-1 text-sm font-medium text-gray-500">
-            Target: <a href={result.url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{result.url}</a>
+          <h2 className="text-2xl font-bold text-[var(--text)]">SEO Health Report</h2>
+          <p className="mt-1 text-sm font-medium text-[var(--text-3)]">
+            Target: <a href={result.url} target="_blank" rel="noreferrer" className="text-[var(--blue)] hover:underline">{result.url}</a>
           </p>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-[var(--text-3)]">
             Generated on {new Date().toLocaleDateString()}
           </p>
         </div>
         
         {/* Score Circle */}
         <div className="flex flex-col items-center">
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gray-50 shadow-inner">
-            <svg className="absolute h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[var(--bg-subtle)] shadow-inner">
+            <svg className="absolute h-full w-full -rotate-90 transform" viewBox="0 0 36 36" width="100%" height="100%">
               <path
-                className="text-gray-200"
+                className="text-[var(--border)]"
                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
-                stroke="currentColor"
+                stroke="#E5E7EB"
                 strokeWidth="3"
               />
               <path
@@ -237,7 +246,7 @@ function DashboardContent({ result }: { result: SeoReportResult }) {
             </svg>
             <span className="text-2xl font-bold" style={{ color: scoreColor }}>{score}</span>
           </div>
-          <span className="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">Overall Score</span>
+          <span className="mt-2 text-xs font-bold uppercase tracking-wider text-[var(--text-3)]">Overall Score</span>
         </div>
       </div>
 
@@ -245,12 +254,12 @@ function DashboardContent({ result }: { result: SeoReportResult }) {
       <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
         <MetricBox title="Page Title" value={result.title} pass={!!result.title} />
         <MetricBox title="Meta Description" value={result.metaDescription} pass={!!result.metaDescription} />
-        <MetricBox title="OpenGraph Image" value={result.ogImage} pass={!!result.ogImage} type="url" />
+        <MetricBox title="OpenGraph Image" value={result.ogImage} pass={!!result.ogImage} type="url" ignoreInPDF />
       </div>
 
       {/* Stats & Progress Bars */}
-      <div className="mb-12 rounded-xl border border-gray-200 bg-gray-50 p-6">
-        <h3 className="mb-6 text-lg font-bold text-gray-900">Content Structure</h3>
+      <div className="mb-12 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+        <h3 className="mb-6 text-lg font-bold text-[var(--text)]">Content Structure</h3>
         <div className="space-y-6">
           <ProgressBar label="H1 Tags" value={result.h1Count} max={3} ideal={1} />
           <ProgressBar label="H2 Tags" value={result.h2Count} max={20} ideal={3} />
@@ -262,27 +271,27 @@ function DashboardContent({ result }: { result: SeoReportResult }) {
   );
 }
 
-function MetricBox({ title, value, pass, type = "text" }: { title: string; value: string | null; pass: boolean; type?: "text" | "url" }) {
+function MetricBox({ title, value, pass, type = "text", ignoreInPDF = false }: { title: string; value: string | null; pass: boolean; type?: "text" | "url", ignoreInPDF?: boolean }) {
   return (
-    <div className="rounded-xl border border-gray-200 p-5 shadow-sm bg-white">
+    <div className="rounded-xl border border-[var(--border)] p-5 shadow-sm bg-white" data-html2canvas-ignore={ignoreInPDF ? "true" : undefined}>
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-sm font-bold text-gray-700">{title}</span>
+        <span className="text-sm font-bold text-[var(--text-2)]">{title}</span>
         {pass ? (
-          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700">Pass</span>
+          <span className="inline-flex items-center rounded-full bg-[var(--green-light)] px-2 py-0.5 text-[10px] font-bold uppercase text-[var(--green)]">Pass</span>
         ) : (
-          <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase text-red-700">Missing</span>
+          <span className="inline-flex items-center rounded-full bg-[var(--red-light)] px-2 py-0.5 text-[10px] font-bold uppercase text-[var(--red)]">Missing</span>
         )}
       </div>
       {value ? (
         type === "url" ? (
-          <a href={value} target="_blank" rel="noreferrer" className="block truncate text-sm text-blue-600 hover:underline">
+          <a href={value} target="_blank" rel="noreferrer" className="block truncate text-sm text-[var(--blue)] hover:underline">
             {value}
           </a>
         ) : (
-          <p className="text-sm text-gray-600 line-clamp-2">{value}</p>
+          <p className="text-sm text-[var(--text-2)] line-clamp-2">{value}</p>
         )
       ) : (
-        <p className="text-sm italic text-gray-400">No {title.toLowerCase()} found.</p>
+        <p className="text-sm italic text-[var(--text-3)]">No {title.toLowerCase()} found.</p>
       )}
     </div>
   );
@@ -291,15 +300,15 @@ function MetricBox({ title, value, pass, type = "text" }: { title: string; value
 function ProgressBar({ label, value, max, ideal, suffix = "" }: { label: string; value: number; max: number; ideal: number; suffix?: string }) {
   const percentage = Math.min((value / max) * 100, 100);
   const isGood = value >= ideal;
-  const barColor = isGood ? "bg-green-500" : value > 0 ? "bg-amber-500" : "bg-red-500";
+  const barColor = isGood ? "bg-[var(--green)]" : value > 0 ? "bg-[var(--amber)]" : "bg-[var(--red)]";
 
   return (
     <div>
       <div className="mb-1.5 flex justify-between text-sm">
-        <span className="font-semibold text-gray-700">{label}</span>
-        <span className="font-medium text-gray-900">{value}{suffix}</span>
+        <span className="font-semibold text-[var(--text-2)]">{label}</span>
+        <span className="font-medium text-[var(--text)]">{value}{suffix}</span>
       </div>
-      <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-200">
+      <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--border)]">
         <div className={`h-2.5 rounded-full ${barColor} transition-all duration-500`} style={{ width: `${percentage}%` }} />
       </div>
     </div>
