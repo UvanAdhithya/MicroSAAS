@@ -90,11 +90,11 @@ export async function POST(req: Request) {
         signal: AbortSignal.timeout(10000),
         redirect: "follow",
       });
-    } catch (err: any) {
-      const msg =
-        err.name === "TimeoutError"
-          ? "The request timed out."
-          : "Could not reach the website.";
+    } catch (err: unknown) {
+      const isTimeout = err instanceof Error && err.name === "TimeoutError";
+      const msg = isTimeout
+        ? "The request timed out."
+        : "Could not reach the website.";
       return NextResponse.json(
         { error: msg },
         { status: 502, headers: corsHeaders }
@@ -125,8 +125,7 @@ export async function POST(req: Request) {
     // cheerio preserves DOM order when selecting multiple selectors
     const headings: HeadingNode[] = [];
     $("h1, h2, h3").each((_, el) => {
-      const node = el as any;
-      const tagName = (node.name || node.tagName || "").toLowerCase();
+      const tagName = ('name' in el ? (el as { name: string }).name : "").toLowerCase();
       const level = parseInt(tagName.replace("h", ""), 10);
       const text = $(el).text().trim();
       if (text && headings.length < 100) {
@@ -150,7 +149,7 @@ export async function POST(req: Request) {
     };
 
     return NextResponse.json(result, { headers: corsHeaders });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Content extraction error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred." },

@@ -54,8 +54,8 @@ export default function ContentExtractorPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -233,10 +233,11 @@ function HeadingBadge({ level }: { level: number }) {
   );
 }
 
+function Pulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />;
+}
+
 function SkeletonLoader() {
-  const Pulse = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />
-  );
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

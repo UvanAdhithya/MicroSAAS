@@ -130,10 +130,11 @@ export async function POST(req: Request) {
           }
         });
 
-      } catch (e: any) {
-        if (e.message.includes("blocked")) {
+      } catch (e: unknown) {
+        const errMsg = e instanceof Error ? e.message : String(e);
+        if (errMsg.includes("blocked")) {
           return NextResponse.json(
-            { error: e.message },
+            { error: errMsg },
             { status: 403, headers: corsHeaders }
           );
         }
@@ -154,7 +155,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ urls: extractedUrls }, { headers: corsHeaders });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sitemap extraction error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred while parsing the sitemap." },

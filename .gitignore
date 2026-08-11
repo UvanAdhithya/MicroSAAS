@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch and test output
+/tests/scratch/
+/test-results/
+/playwright-report/
+

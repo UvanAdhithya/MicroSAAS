@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+
 export function SiteHeader() {
   return (
     <header style={{
@@ -13,7 +15,7 @@ export function SiteHeader() {
         maxWidth: 1160, margin: "0 auto", padding: "0 24px",
         height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <a href="/" className="nav-logo">
+        <Link href="/" className="nav-logo">
           <svg width="34" height="34" viewBox="0 0 28 28" fill="none">
             <rect width="28" height="28" rx="7" fill="var(--accent)" />
             <path d="M9 10L5.5 14L9 18M19 10L22.5 14L19 18M15.5 8L12.5 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -21,12 +23,13 @@ export function SiteHeader() {
           <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "-0.02em" }}>
             dev<span style={{ color: "var(--accent-fg)" }}>tools</span>
           </span>
-        </a>
+        </Link>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <a href="/" className="nav-link">All Tools</a>
+        <nav style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/" className="nav-link">All Tools</Link>
           <a href="https://github.com/UvanAdhithya/MicroSAAS" className="nav-link">GitHub</a>
-          <a href="/try" className="nav-cta">Try free</a>
+          <Link href="/login" className="nav-link" style={{ fontWeight: 600 }}>Sign In</Link>
+          <Link href="/signup" className="nav-cta">Try free</Link>
         </nav>
       </div>
     </header>

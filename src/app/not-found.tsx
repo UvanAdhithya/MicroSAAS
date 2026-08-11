@@ -48,7 +48,7 @@ export default function NotFound() {
           lineHeight: 1.6,
         }}
       >
-        The tool or page you're looking for doesn't exist or has been moved.
+        The tool or page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <Link
         href="/"

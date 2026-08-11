@@ -79,12 +79,13 @@ async function checkLink(url: string): Promise<LinkResult> {
       status: res.status,
       ok: res.status >= 200 && res.status < 400,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const isTimeout = err instanceof Error && err.name === "TimeoutError";
     return {
       url,
       status: null,
       ok: false,
-      error: err.name === "TimeoutError" ? "Timeout" : "Unreachable",
+      error: isTimeout ? "Timeout" : "Unreachable",
     };
   }
 }
@@ -141,11 +142,11 @@ export async function POST(req: Request) {
         signal: AbortSignal.timeout(10000),
         redirect: "follow",
       });
-    } catch (err: any) {
-      const msg =
-        err.name === "TimeoutError"
-          ? "The request timed out."
-          : "Could not reach the website.";
+    } catch (err: unknown) {
+      const isTimeout = err instanceof Error && err.name === "TimeoutError";
+      const msg = isTimeout
+        ? "The request timed out."
+        : "Could not reach the website.";
       return NextResponse.json(
         { error: msg },
         { status: 502, headers: corsHeaders }
@@ -214,7 +215,7 @@ export async function POST(req: Request) {
       },
       { headers: corsHeaders }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Link checker error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred." },

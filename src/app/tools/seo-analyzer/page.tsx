@@ -65,8 +65,8 @@ export default function SeoAnalyzerPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -166,11 +166,11 @@ function ChevronIcon() {
 
 /* ── Skeleton Dashboard ─────────────────────────────────── */
 
-function SkeletonDashboard() {
-  const Pulse = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />
-  );
+function Pulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />;
+}
 
+function SkeletonDashboard() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Title & Description skeleton */}

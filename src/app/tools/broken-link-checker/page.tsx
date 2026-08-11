@@ -57,8 +57,8 @@ export default function BrokenLinkCheckerPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -177,10 +177,11 @@ function ChevronIcon() {
 
 /* ── Skeleton ───────────────────────────────────────────── */
 
+function Pulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />;
+}
+
 function SkeletonLoader() {
-  const Pulse = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />
-  );
   return (
     <div className="space-y-6">
       {/* Stats row skeleton */}

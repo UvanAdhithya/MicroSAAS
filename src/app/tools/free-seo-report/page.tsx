@@ -42,8 +42,8 @@ export default function FreeSeoReportPage() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -76,9 +76,9 @@ export default function FreeSeoReportPage() {
 
       pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`SEO_Report_${new URL(result!.url).hostname}.pdf`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("PDF generation failed:", err);
-      alert(`Failed to generate PDF. Error: ${err?.message || err}`);
+      alert(`Failed to generate PDF. Error: ${err instanceof Error ? err.message : err}`);
     } finally {
       setDownloading(false);
     }
@@ -332,10 +332,11 @@ function SpinnerIcon() {
   );
 }
 
+function Pulse({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />;
+}
+
 function SkeletonLoader() {
-  const Pulse = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded-lg bg-[var(--border)] ${className ?? ""}`} />
-  );
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-raised)] p-8">

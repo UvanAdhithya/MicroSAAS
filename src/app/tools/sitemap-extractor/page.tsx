@@ -36,8 +36,8 @@ export default function SitemapExtractorPage() {
       }
 
       setResults(data.urls || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -80,10 +80,10 @@ export default function SitemapExtractorPage() {
 
       <div className="mb-10 text-center">
         <h1 className="mb-4 text-3xl font-bold tracking-tight text-[var(--text)] sm:text-4xl">
-          Sitemap & URL Extractor
+          Sitemap &amp; URL Extractor
         </h1>
         <p className="mx-auto max-w-2xl text-[var(--text-2)]">
-          Quickly discover all public URLs from a domain's sitemap. We'll check
+          Quickly discover all public URLs from a domain&apos;s sitemap. We&apos;ll check
           robots.txt, parse XML sitemaps, and give you a clean export.
         </p>
       </div>

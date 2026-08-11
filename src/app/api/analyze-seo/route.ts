@@ -117,9 +117,10 @@ export async function POST(req: Request) {
         signal: AbortSignal.timeout(10000), // 10 second timeout
         redirect: "follow",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Timeout or network error
-      const msg = err.name === "TimeoutError"
+      const isTimeout = err instanceof Error && err.name === "TimeoutError";
+      const msg = isTimeout
         ? "The request timed out. The site may be slow or blocking crawlers."
         : "Could not reach the website. Please check the URL and try again.";
       return NextResponse.json(
@@ -217,7 +218,7 @@ export async function POST(req: Request) {
     };
 
     return NextResponse.json(result, { headers: corsHeaders });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("SEO analysis error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred during analysis." },

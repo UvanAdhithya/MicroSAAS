@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 /* ─── Types ─────────────────────────────────────────── */
 type Category = "all" | "seo" | "data" | "audit";
@@ -137,11 +137,9 @@ const CAT_COLOR: Record<string, string> = {
 
 /* ─── Page ───────────────────────────────────────────── */
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false);
+  const [mounted] = useState(() => typeof window !== "undefined");
   const [active, setActive] = useState<Category>("all");
   const [query, setQuery] = useState("");
-
-  useEffect(() => { setMounted(true); }, []);
 
   const visible = tools.filter(t => {
     const catOk = active === "all" || t.category === active;
