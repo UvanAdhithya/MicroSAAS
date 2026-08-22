@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 /* ─────────────────────────────────────────────────────────
@@ -245,11 +246,14 @@ function ResultsDashboard({ result }: { result: SeoResult }) {
           {/* URL bar */}
           <div className="mb-1 flex items-center gap-2">
             {result.favicon && (
-              <img
+              <Image
                 src={resolveUrl(result.favicon, result.url)}
                 alt=""
+                width={16}
+                height={16}
+                unoptimized
                 className="h-4 w-4 rounded-sm"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
               />
             )}
             <span className="truncate text-[13px] text-[#202124]">
@@ -271,11 +275,14 @@ function ResultsDashboard({ result }: { result: SeoResult }) {
       <DashboardCard title="OpenGraph Data" icon="🌐">
         {result.og.image && (
           <div className="mb-4 overflow-hidden rounded-xl border border-[var(--border)]">
-            <img
+            <Image
               src={resolveUrl(result.og.image, result.url)}
               alt="OG Image"
+              width={1200}
+              height={630}
+              unoptimized
               className="h-44 w-full object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
             />
           </div>
         )}
