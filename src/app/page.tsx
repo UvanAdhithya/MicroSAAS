@@ -268,6 +268,7 @@ function ToolCard({ tool }: { tool: Tool }) {
         color: "white", background: "var(--accent)", borderRadius: 9,
         textDecoration: "none", transition: "opacity 0.15s",
         opacity: hovered ? 1 : 0.88,
+        marginTop: "auto",
       }}>
         Try tool
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
