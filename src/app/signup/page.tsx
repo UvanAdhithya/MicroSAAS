@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createSupabaseBrowserClient } from '@/lib/supabase-client';
+import { signUpWithEmail } from '@/lib/auth-client';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -20,19 +20,18 @@ export default function SignupPage() {
     setSuccess(null);
 
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { data, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { error: authError, needsConfirmation } = await signUpWithEmail(email, password);
 
       if (authError) {
-        setError(authError.message);
-      } else if (data?.user) {
-        setSuccess('Account created successfully! Check your email to confirm registration.');
+        setError(authError);
+      } else if (needsConfirmation) {
+        setSuccess('Account created! Check your email to confirm registration.');
         setTimeout(() => {
           router.push('/login');
         }, 2500);
+      } else {
+        router.push('/dashboard');
+        router.refresh();
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -51,7 +50,7 @@ export default function SignupPage() {
         <div className="relative z-10">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Create Account</h1>
-            <p className="text-slate-400 text-sm">Join DevTools Hub for free micro-saas developer utilities</p>
+            <p className="text-slate-400 text-sm">Join SEOSnap for free SEO audits and saved reports</p>
           </div>
 
           {error && (

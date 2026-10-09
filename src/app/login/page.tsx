@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createSupabaseBrowserClient } from '@/lib/supabase-client';
+import { signInWithEmail } from '@/lib/auth-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,16 +18,13 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const supabase = createSupabaseBrowserClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error: authError } = await signInWithEmail(email, password);
 
       if (authError) {
-        setError(authError.message);
+        setError(authError);
       } else {
-        router.push('/');
+        const next = new URLSearchParams(window.location.search).get('next');
+        router.push(next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard');
         router.refresh();
       }
     } catch (err: unknown) {
@@ -47,7 +44,7 @@ export default function LoginPage() {
         <div className="relative z-10">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Welcome Back</h1>
-            <p className="text-slate-400 text-sm">Sign in to your DevTools Hub account</p>
+            <p className="text-slate-400 text-sm">Sign in to your SEOSnap account</p>
           </div>
 
           {error && (
