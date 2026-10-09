@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { SaveReportButton } from "@/components/save-report-button";
 
 /* ─────────────────────────────────────────────────────────
  * SEO Analyzer — Frontend Page
@@ -139,6 +140,7 @@ export default function SeoAnalyzerPage() {
       {loading && <SkeletonDashboard />}
 
       {/* ── Results dashboard ── */}
+      {result && !loading && <SaveReportButton toolName="SEO Analyzer" data={result} />}
       {result && !loading && (
         <div className="mb-12 space-y-8">
           <ResultsDashboard result={result} />

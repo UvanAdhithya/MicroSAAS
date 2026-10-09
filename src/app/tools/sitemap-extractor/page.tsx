@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { SaveReportButton } from "@/components/save-report-button";
 
 interface ExtractedUrl {
   url: string;
@@ -125,6 +126,7 @@ export default function SitemapExtractorPage() {
         )}
       </div>
 
+      {results.length > 0 && <SaveReportButton toolName="Sitemap Extractor" data={{ urls: results }} />}
       {results.length > 0 && (
         <div className="animate-fade-in-up">
           <div className="mb-4 flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { SaveReportButton } from "@/components/save-report-button";
 
 /* ─────────────────────────────────────────────────────────
  * Broken Link Checker — Frontend Page
@@ -150,6 +151,7 @@ export default function BrokenLinkCheckerPage() {
       {loading && <SkeletonLoader />}
 
       {/* ── Results ── */}
+      {result && !loading && <SaveReportButton toolName="Broken Link Checker" data={result} />}
       {result && !loading && (
         <>
           <ResultsDashboard result={result} onDownload={handleDownloadCSV} />

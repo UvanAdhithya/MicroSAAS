@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import { SaveReportButton } from "@/components/save-report-button";
 import { SeoReportResult } from "../../api/free-seo-report/route";
 
 /* ─────────────────────────────────────────────────────────
@@ -145,6 +146,7 @@ export default function FreeSeoReportPage() {
       {loading && <SkeletonLoader />}
 
       {/* ── Dashboard & Results ── */}
+      {result && !loading && <SaveReportButton toolName="Free SEO Report" data={result} />}
       {result && !loading && (
         <div className="mb-12 space-y-8">
           <div className="flex justify-end">

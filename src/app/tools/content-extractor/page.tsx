@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { SaveReportButton } from "@/components/save-report-button";
 
 /* ─────────────────────────────────────────────────────────
  * Content Extractor — Frontend Page
@@ -125,6 +126,7 @@ export default function ContentExtractorPage() {
       {loading && <SkeletonLoader />}
 
       {/* ── Results Dashboard ── */}
+      {result && !loading && <SaveReportButton toolName="Content Extractor" data={result} />}
       {result && !loading && (
         <div className="mb-12 space-y-6">
           {/* Stats Header */}
