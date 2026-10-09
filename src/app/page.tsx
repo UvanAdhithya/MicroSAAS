@@ -158,11 +158,11 @@ export default function HomePage() {
           Free tools
         </p>
         <h1 style={{ fontSize: "clamp(36px,6vw,64px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08, color: "var(--text)", margin: "0 auto 20px", maxWidth: 720 }}>
-          Free Developer utilities<br />
-          <span style={{ color: "var(--accent-fg)" }}>that respect your time.</span>
+          Snap an SEO audit<br />
+          <span style={{ color: "var(--accent-fg)" }}>of any website in seconds.</span>
         </h1>
         <p style={{ fontSize: 18, color: "var(--text-2  )", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
-          {tools.length} tools. No login. No ads. Everything runs in your browser.
+          {tools.length} free SEO tools. No signup required. Create a free account to save your reports.
         </p>
       </div>
 

@@ -4,7 +4,7 @@ export async function GET() {
   return NextResponse.json(
     {
       status: 'ok',
-      service: 'devtools-hub',
+      service: 'seosnap',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',

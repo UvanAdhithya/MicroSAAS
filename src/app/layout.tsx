@@ -7,10 +7,10 @@ const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-int
 const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--font-mono", weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: { template: "%s — DevTools", default: "DevTools — Free developer utilities" },
-  description: "Fast, free developer tools that run entirely in your browser. JSON formatter, regex tester, JWT debugger, UUID generator, and more.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  openGraph: { type: "website", siteName: "DevTools" },
+  title: { template: "%s — SEOSnap", default: "SEOSnap — Free SEO audit & website analysis tools" },
+  description: "SEOSnap: free SEO analyzer, broken link checker, sitemap extractor, content extractor and instant SEO reports for any website.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.seosnap.xyz"),
+  openGraph: { type: "website", siteName: "SEOSnap" },
   robots: { index: true, follow: true },
   verification: { google: "c8NVcS7u1cw86D3xvzzAzknlPPjb4zUZJa-9jXO2cic" },
 };

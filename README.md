@@ -1,8 +1,8 @@
-# MicroSAAS (DevTools Hub)
+# SEOSnap
 
 A Next.js 16 micro-SaaS app that provides free SEO and content analysis tools.
 
-Live app: https://devtools-lilac-nine.vercel.app/
+Live app: https://www.seosnap.xyz (mirror: https://devtools-lilac-nine.vercel.app/)
 
 ## Features
 
