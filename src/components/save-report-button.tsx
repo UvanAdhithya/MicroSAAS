@@ -10,10 +10,25 @@ interface Props {
   title?: string;
 }
 
+/** Safely read a non-empty string field from an unknown, untrusted payload. */
+function readString(source: unknown, key: string): string | null {
+  if (!source || typeof source !== "object") return null;
+  const value = (source as Record<string, unknown>)[key];
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
 function deriveTitle(toolName: string, data: unknown): string {
-  if (data && typeof data === "object" && "url" in data && typeof (data as { url: unknown }).url === "string") {
-    return `${toolName}: ${(data as { url: string }).url}`;
+  // Tools name their subject URL differently: most use `url`, the link
+  // checker uses `scannedUrl`, and the sitemap extractor only has a list.
+  const direct = readString(data, "url") ?? readString(data, "scannedUrl");
+  if (direct) return `${toolName}: ${direct}`;
+
+  const urls = data && typeof data === "object" ? (data as Record<string, unknown>).urls : null;
+  if (Array.isArray(urls)) {
+    const first = readString(urls[0], "url");
+    if (first) return `${toolName}: ${first}`;
   }
+
   return `${toolName} report`;
 }
 

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { savedReports } from "@/db/schema";
 import { getCurrentUserId } from "@/lib/auth";
+import { ReportView } from "./report-views";
 
 export const dynamic = "force-dynamic";
 
@@ -25,12 +26,22 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
     <div style={{ maxWidth: 1160, margin: "0 auto", padding: "48px 24px" }}>
       <Link href="/dashboard" style={{ color: "var(--accent-fg)", fontSize: 14 }}>← Back to dashboard</Link>
       <h1 style={{ fontSize: 28, fontWeight: 800, margin: "16px 0 4px" }}>{report.reportTitle ?? report.toolName}</h1>
-      <p style={{ color: "var(--text-3)", marginBottom: 24, fontSize: 14 }}>
+      <p style={{ color: "var(--text-3)", marginBottom: 32, fontSize: 14 }}>
         {report.toolName} · {report.createdAt.toLocaleString("en-IN")}
       </p>
-      <pre style={{ background: "var(--surface, #f6f6f7)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, overflow: "auto", fontSize: 13, fontFamily: "var(--mono)", maxHeight: "70vh" }}>
-        {JSON.stringify(report.reportData, null, 2)}
-      </pre>
+
+      <ReportView toolName={report.toolName} data={report.reportData} />
+
+      {/* Escape hatch: report_data is untyped jsonb, so keep the exact payload
+          reachable for fields the structured views above don't surface. */}
+      <details style={{ marginTop: 32 }}>
+        <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 600, color: "var(--text-2)" }}>
+          Raw JSON
+        </summary>
+        <pre style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)", borderRadius: 12, padding: 20, overflow: "auto", fontSize: 13, fontFamily: "var(--mono)", maxHeight: "70vh", marginTop: 12 }}>
+          {JSON.stringify(report.reportData, null, 2)}
+        </pre>
+      </details>
     </div>
   );
 }
