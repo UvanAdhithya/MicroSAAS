@@ -1,5 +1,30 @@
-"use client";
-import { useState } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+/* ─────────────────────────────────────────────────────────
+ * Home page — server component
+ * ─────────────────────────────────────────────────────────
+ * This page previously carried `if (!mounted) return null;`,
+ * which meant the server sent an empty shell: no h1, no h2, no
+ * tool catalog. Googlebot may render that in a second pass,
+ * but Bing, GPTBot, PerplexityBot and ClaudeBot never execute
+ * JavaScript, so for them the page did not exist.
+ *
+ * Nothing here needs client state. Filtering moved to the URL
+ * (`?q=` and `?cat=`) and is resolved on the server, so the
+ * whole page — hero, headings and every tool card — is in the
+ * HTML. The category chips are real links and the search is a
+ * plain GET form, so both still work with JavaScript disabled.
+ * ───────────────────────────────────────────────────────── */
+
+export const metadata: Metadata = {
+  // `absolute` because the root layout's title template only applies to
+  // descendant segments, and this page shares the root layout's own segment.
+  title: { absolute: "Free SEO Tools for Any Website — SEOSnap" },
+  description:
+    "Five free SEO tools that need no signup: instant SEO audit, technical SEO report with PDF export, content outline extractor, sitemap extractor and broken link checker.",
+  alternates: { canonical: "/" },
+};
 
 /* ─── Types ─────────────────────────────────────────── */
 type Category = "all" | "seo" | "data" | "audit";
@@ -13,7 +38,18 @@ type Tool = {
   Widget: () => React.JSX.Element;
 };
 
-/* ─── Inline widget components ───────────────────────── */
+/* ─── Inline widget components (static illustrations) ── */
+
+function WidgetShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      background: "var(--bg-raised)", border: "1px solid var(--border)",
+      borderRadius: 10, padding: 12, marginBottom: 2,
+    }}>
+      {children}
+    </div>
+  );
+}
 
 function SeoAnalyzerWidget() {
   return (
@@ -34,18 +70,16 @@ function SeoAnalyzerWidget() {
 }
 
 function SitemapWidget() {
-  const [url, setUrl] = useState("https://example.com");
   return (
     <WidgetShell>
       <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-        <input suppressHydrationWarning value={url} onChange={e => setUrl(e.target.value)}
-          style={{ flex: 1, fontSize: 12, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text)", outline: "none" }} />
-        <button style={{ fontSize: 12, fontWeight: 600, color: "white", background: "var(--accent)", border: "none", borderRadius: 6, padding: "0 12px", cursor: "pointer" }}>
+        <div style={{ flex: 1, fontSize: 12, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 12px" }}>
           Crawl
-        </button>
+        </div>
       </div>
       <div style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--text-3)", padding: "8px", background: "var(--bg-subtle)", border: "1px dashed var(--border)", borderRadius: 6, textAlign: "center" }}>
-        Extracts all public links<br/>from robots.txt & sitemaps
+        Extracts all public links<br />from robots.txt &amp; sitemaps
       </div>
     </WidgetShell>
   );
@@ -103,18 +137,6 @@ function FreeSeoReportWidget() {
   );
 }
 
-/* ─── Shared widget shell ──────────────────────────── */
-function WidgetShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{
-      background: "var(--bg-raised)", border: "1px solid var(--border)",
-      borderRadius: 10, padding: 12, marginBottom: 2,
-    }}>
-      {children}
-    </div>
-  );
-}
-
 /* ─── Tool list ──────────────────────────────────────── */
 const tools: Tool[] = [
   { slug: "seo-analyzer", name: "SEO Analyzer", description: "Instantly audit any page's title, meta tags, OpenGraph data, headings, and see a live Google SERP preview.", category: "seo", badge: "new", Widget: SeoAnalyzerWidget },
@@ -135,11 +157,19 @@ const CAT_COLOR: Record<string, string> = {
   seo: "#0891B2", data: "#D97706", audit: "#DC2626",
 };
 
+const VALID_CATS: Category[] = ["all", "seo", "data", "audit"];
+
 /* ─── Page ───────────────────────────────────────────── */
-export default function HomePage() {
-  const [mounted] = useState(() => typeof window !== "undefined");
-  const [active, setActive] = useState<Category>("all");
-  const [query, setQuery] = useState("");
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; cat?: string }>;
+}) {
+  const params = await searchParams;
+  const query = (params.q ?? "").trim();
+  const active: Category = VALID_CATS.includes(params.cat as Category)
+    ? (params.cat as Category)
+    : "all";
 
   const visible = tools.filter(t => {
     const catOk = active === "all" || t.category === active;
@@ -147,8 +177,6 @@ export default function HomePage() {
     const searchOk = !q || t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.category.includes(q);
     return catOk && searchOk;
   });
-
-  if (!mounted) return null;
 
   return (
     <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
@@ -161,42 +189,60 @@ export default function HomePage() {
           Snap an SEO audit<br />
           <span style={{ color: "var(--accent-fg)" }}>of any website in seconds.</span>
         </h1>
-        <p style={{ fontSize: 18, color: "var(--text-2  )", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
+        <p style={{ fontSize: 18, color: "var(--text-2)", lineHeight: 1.6, maxWidth: 500, margin: "0 auto" }}>
           {tools.length} free SEO tools. No signup required. Create a free account to save your reports.
         </p>
       </div>
 
-      {/* ── Controls ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 0", flexWrap: "wrap" }}>
+      {/* ── Catalog heading ── */}
+      <div style={{ paddingTop: 44 }}>
+        <h2 style={{ fontSize: 24, fontWeight: 750, letterSpacing: "-0.025em", margin: 0, color: "var(--text)" }}>
+          All free SEO tools
+        </h2>
+        <p style={{ fontSize: 14.5, color: "var(--text-2)", margin: "8px 0 0", maxWidth: 640, lineHeight: 1.6 }}>
+          Every tool runs without an account and returns results immediately. Use them on your own site
+          or on a competitor&apos;s to see exactly what search engines and AI assistants are served.
+        </p>
+      </div>
+
+      {/* ── Controls (GET form + links, so these work without JS) ── */}
+      <form method="get" action="/" style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 0", flexWrap: "wrap" }}>
         {/* Search */}
         <div style={{ position: "relative", flex: "0 0 220px" }}>
-          <svg style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--text-3)", pointerEvents: "none" }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
           </svg>
-          <input suppressHydrationWarning value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools…"
-            style={{ width: "100%", fontSize: 13.5, padding: "8px 10px 8px 30px", border: "1px solid var(--border)", borderRadius: 9, background: "var(--bg-subtle)", color: "var(--text)", outline: "none", transition: "border-color 0.15s" }}
+          <input name="q" defaultValue={query} placeholder="Search tools…" aria-label="Search tools"
+            style={{ width: "100%", fontSize: 13.5, padding: "8px 10px 8px 30px", border: "1px solid var(--border)", borderRadius: 9, background: "var(--bg-subtle)", color: "var(--text)", outline: "none" }}
           />
         </div>
+        <noscript>
+          <button type="submit" style={{ fontSize: 13, fontWeight: 600, padding: "8px 14px", borderRadius: 9, border: "1px solid var(--accent)", background: "var(--accent)", color: "white", cursor: "pointer" }}>
+            Search
+          </button>
+        </noscript>
 
-        {/* Category chips */}
+        {/* Category chips — real links, so they work without JS */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setActive(c.id)}
+            <Link key={c.id}
+              href={{ pathname: "/", query: { ...(query ? { q: query } : {}), ...(c.id === "all" ? {} : { cat: c.id }) } }}
+              scroll={false}
               style={{
                 padding: "6px 13px", fontSize: 13, fontWeight: active === c.id ? 600 : 450,
                 borderRadius: 99, border: "1px solid",
                 borderColor: active === c.id ? "var(--accent)" : "var(--border)",
                 background: active === c.id ? "var(--accent)" : "transparent",
                 color: active === c.id ? "white" : "var(--text-2)",
-                cursor: "pointer", transition: "all 0.15s",
-              }}>{c.label}</button>
+                textDecoration: "none", transition: "all 0.15s",
+              }}>{c.label}</Link>
           ))}
         </div>
 
         <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--text-3)", fontFamily: "var(--mono)" }}>
           {visible.length}/{tools.length}
         </span>
-      </div>
+      </form>
 
       {/* ── Grid ── */}
       <div style={{
@@ -207,35 +253,32 @@ export default function HomePage() {
       }}>
         {visible.map(tool => <ToolCard key={tool.slug} tool={tool} />)}
       </div>
+
+      {visible.length === 0 && (
+        <div style={{ border: "1px dashed var(--border)", borderRadius: 12, padding: 32, textAlign: "center", color: "var(--text-3)", marginBottom: 64 }}>
+          No tools match &ldquo;{query}&rdquo;. <Link href="/" style={{ color: "var(--accent-fg)", fontWeight: 600 }}>Show all {tools.length} tools</Link>.
+        </div>
+      )}
     </div>
   );
 }
 
 function ToolCard({ tool }: { tool: Tool }) {
-  const [hovered, setHovered] = useState(false);
   const accent = CAT_COLOR[tool.category] ?? "#6B6B6A";
 
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: "var(--bg-raised)",
-        border: "1px solid",
-        borderColor: hovered ? "var(--border-strong)" : "var(--border)",
-        borderRadius: 14,
-        padding: "18px 18px 14px",
-        display: "flex", flexDirection: "column", gap: 10,
-        boxShadow: hovered ? "var(--shadow-card-hover)" : "var(--shadow-card)",
-        transition: "box-shadow 0.2s, border-color 0.2s, transform 0.15s",
-        transform: hovered ? "translateY(-2px)" : "none",
-        cursor: "default",
-      }}
-    >
+    <div className="tool-card" style={{
+      background: "var(--bg-raised)",
+      border: "1px solid var(--border)",
+      borderRadius: 14,
+      padding: "18px 18px 14px",
+      display: "flex", flexDirection: "column", gap: 10,
+      boxShadow: "var(--shadow-card)",
+    }}>
       {/* Card header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
         <div>
-          <h2 style={{ fontSize: 15, fontWeight: 650, letterSpacing: "-0.02em", color: "var(--text)", margin: "0 0 3px" }}>{tool.name}</h2>
+          <h3 style={{ fontSize: 15, fontWeight: 650, letterSpacing: "-0.02em", color: "var(--text)", margin: "0 0 3px" }}>{tool.name}</h3>
           <p style={{ fontSize: 12.5, color: "var(--text-2)", margin: 0, lineHeight: 1.5 }}>{tool.description}</p>
         </div>
       </div>
@@ -258,23 +301,22 @@ function ToolCard({ tool }: { tool: Tool }) {
         )}
       </div>
 
-      {/* Live widget */}
+      {/* Static preview */}
       <tool.Widget />
 
       {/* CTA */}
-      <a href={`/tools/${tool.slug}`} style={{
+      <Link href={`/tools/${tool.slug}`} className="tool-card-cta" style={{
         display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
         padding: "9px 0", fontSize: 13.5, fontWeight: 600,
         color: "white", background: "var(--accent)", borderRadius: 9,
         textDecoration: "none", transition: "opacity 0.15s",
-        opacity: hovered ? 1 : 0.88,
         marginTop: "auto",
       }}>
         Try tool
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-      </a>
+      </Link>
     </div>
   );
 }
