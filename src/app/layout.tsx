@@ -8,7 +8,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], display: "swap", variable: "--
 
 export const metadata: Metadata = {
   title: { template: "%s — SEOSnap", default: "SEOSnap — Free SEO audit & website analysis tools" },
-  description: "SEOSnap: free SEO analyzer, broken link checker, sitemap extractor, content extractor and instant SEO reports for any website.",
+  description: "SEOSnap: free SEO analyzer, broken link checker, sitemap and content extractors, and an AI readability checker. No signup required.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.seosnap.xyz"),
   openGraph: { type: "website", siteName: "SEOSnap" },
   robots: { index: true, follow: true },

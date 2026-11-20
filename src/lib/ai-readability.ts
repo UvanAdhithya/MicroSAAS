@@ -2,10 +2,12 @@
  * AI readability — scoring model
  * ─────────────────────────────────────────────────────────
  * Answers one question: can an AI assistant actually read this
- * page? ChatGPT, Perplexity, Claude and Bing's crawlers do not
- * execute JavaScript, so for them a client-rendered page is an
- * empty document. Googlebot may eventually render it in a second
- * pass; these crawlers never do.
+ * page? The dedicated AI crawlers — GPTBot, ClaudeBot,
+ * PerplexityBot and their equivalents — do not execute
+ * JavaScript, so for them a client-rendered page is an empty
+ * document. Googlebot and Bingbot are the exception: they render
+ * JavaScript in a second pass. That difference is why a site can
+ * rank well in search and still be unreadable to assistants.
  *
  * This module is pure: it turns already-measured page signals
  * into a scored list of checks. Fetching and parsing live in the
@@ -116,10 +118,22 @@ export const AI_CRAWLER_AGENTS = [
 /* ── Thresholds (exported so the UI can explain them) ───── */
 
 export const THRESHOLDS = {
-  /** Words of server-rendered body text. */
-  words: { fail: 50, pass: 300 },
-  /** Ratio of visible text bytes to total HTML bytes. */
-  textRatio: { fail: 0.05, pass: 0.1 },
+  /** Words of server-rendered body text.
+   *  150 rather than 300: a homepage whose catalog and headings are fully
+   *  server-rendered legitimately carries ~160 words. The check asks whether
+   *  content is in the HTML at all, not whether the page is long. */
+  words: { fail: 50, pass: 150 },
+  /** Ratio of visible text bytes to total HTML bytes.
+   *  Calibrated against live measurements, not guesswork:
+   *    react.dev     1,045 words in HTML, 2.8%  -> SSR, must not fail
+   *    seosnap.xyz     163 words in HTML, 2.5%  -> SSR, must not fail
+   *    example.com      25 words in HTML, 27%   -> static, passes
+   *    web.telegram.org  0 words in HTML, 0.0%  -> CSR shell, must fail
+   *  Modern frameworks ship large inline script payloads, so a healthy
+   *  server-rendered page often sits near 2-3%. A 5% floor failed both SSR
+   *  sites, which would have made this check cry wolf on exactly the pages
+   *  it should praise. Only a proportionally empty document now fails. */
+  textRatio: { fail: 0.01, pass: 0.05 },
   /** Characters. */
   title: { min: 15 },
   metaDescription: { min: 50 },
@@ -184,7 +198,7 @@ export function evaluateAiReadability(input: AiReadabilityInput): AiReadabilityR
       `${page.wordCount.toLocaleString()} words of body text are present in the served HTML.`,
       wordStatus === "pass"
         ? null
-        : "Your text is being added by JavaScript, which non-JS crawlers never see. Server-render the content, or add a pre-rendered fallback, so the words exist in the initial HTML response.",
+        : "Only a little body text appears in the served HTML. Either the page is genuinely thin, or its words are added by JavaScript after load and non-JS crawlers never see them. Open the raw HTML (View Source) to tell which: if the text is missing there, server-render it or add a pre-rendered fallback.",
     ),
   );
 
