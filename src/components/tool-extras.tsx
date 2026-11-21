@@ -184,6 +184,14 @@ const FAQS: Record<string, Faq[]> = {
       a: "Some servers block automated requests or reject HEAD requests specifically. SEOSnap retries with GET when HEAD fails, but a minority of sites block bots outright and will always report as unreachable.",
     },
     {
+      q: "Can I tell which link on my page is broken?",
+      a: "Yes. Every result shows the anchor text of the link pointing at it, so you can find it in your page and fix it. Most free link checkers report a broken URL without saying where on the page it came from, which leaves you hunting through your own markup for it.",
+    },
+    {
+      q: "Does it show redirect chains?",
+      a: "Yes. Each redirect hop is followed and reported, for working links as well as broken ones. A link that only resolves after three hops is usually a misconfiguration and leaks link equity while it slows every visitor down. Most free checkers silently flatten the chain to the final URL, which hides the problem.",
+    },
+    {
       q: "Is it free and unlimited?",
       a: "Yes. Free, no signup, and no daily limit on scans.",
     },

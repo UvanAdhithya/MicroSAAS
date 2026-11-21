@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-SiteGPTClone (rebranded and deployed as **SEOSnap**) is a Next.js 16 micro-SaaS application providing high-speed, free technical SEO and web content analysis tools. It features five distinct scraping and auditing utilities, edge API routes, optional Supabase authentication, Drizzle ORM persistence for user reports, IP rate-limiting via Upstash Redis, and an automated CI pipeline with Vitest and Playwright.
+SiteGPTClone (rebranded and deployed as **SEOSnap**) is a Next.js 16 micro-SaaS application providing high-speed, free technical SEO and web content analysis tools. It features six distinct scraping and auditing utilities, edge API routes, optional Supabase authentication, Drizzle ORM persistence for user reports, IP rate-limiting via Upstash Redis, and an automated CI pipeline with Vitest and Playwright.
 
 This document serves as the canonical handoff bridge from Gemini Antigravity to Claude Code CLI, providing all recovered architectural decisions, verified runtime facts, gotchas, and prioritized next steps.
 
@@ -27,7 +27,7 @@ This document serves as the canonical handoff bridge from Gemini Antigravity to 
 
 ## 3. Product Requirements and Expected User Experience
 
-1. **Unrestricted Public Tool Usage**: Visitors can run any of the 5 tools anonymously without limits other than rate-limiting protection.
+1. **Unrestricted Public Tool Usage**: Visitors can run any of the 6 tools anonymously without limits other than rate-limiting protection.
 2. **Instant Visual Feedback**: Results render immediately upon completion with clear status badges, tag tables, and Google SERP snippet previews.
 3. **Report Saving**: Each tool page features a `SaveReportButton`. Unauthenticated users see a gentle prompt to register; authenticated users can save the audit with a single click.
 4. **Dashboard Management**: The `/dashboard` route lists all saved reports for the logged-in user with timestamps and a delete option. Clicking a report opens `/dashboard/reports/[id]`, which re-renders the audit as a structured, tool-specific visual breakdown (matching the original tool's output) rather than raw JSON, with the exact stored payload still reachable behind a collapsed "Raw JSON" disclosure.
@@ -48,13 +48,13 @@ flowchart TD
     
     subgraph Frontend ["Frontend UI Pages"]
         AppRouter --> Home["/ (Home Catalog)"]
-        AppRouter --> ToolPages["/tools/* (5 Tool Pages)"]
+        AppRouter --> ToolPages["/tools/* (6 Tool Pages)"]
         AppRouter --> AuthPages["/login, /signup"]
         AppRouter --> Dashboard["/dashboard & /dashboard/reports/[id]"]
     end
 
     subgraph Backend ["Backend & APIs"]
-        AppRouter --> ToolAPIs["/api/analyze-seo, /api/extract-*, /api/check-links (Edge)"]
+        AppRouter --> ToolAPIs["/api/analyze-seo, /api/extract-*, /api/check-links, /api/ai-readability (Edge)"]
         AppRouter --> ReportAPI["/api/reports (Node.js runtime)"]
         ToolAPIs --> ExtTarget["External Websites (Cheerio Scraper)"]
         ReportAPI --> Drizzle["Drizzle ORM (src/db)"]
@@ -73,25 +73,34 @@ D:\SiteGPTClone\
 ├── src\
 │   ├── app\
 │   │   ├── api\                # Route Handlers
+│   │   │   ├── ai-readability\ # Edge: 14 AI-crawler readability signals + robots.txt AI-token parse
 │   │   │   ├── analyze-seo\    # Edge: Cheerio on-page SEO extractor
-│   │   │   ├── check-links\    # Edge: Concurrent broken link checker
+│   │   │   ├── check-links\    # Edge: Broken link checker with anchor text + redirect chains
 │   │   │   ├── extract-content\# Edge: Document heading outline extractor
 │   │   │   ├── extract-sitemap\# Edge: robots.txt and XML sitemap parser
 │   │   │   ├── free-seo-report\# Edge: High-level metrics for PDF export
 │   │   │   ├── health\         # Edge: Public health check endpoint
 │   │   │   └── reports\        # Node.js: Authenticated CRUD for saved reports
 │   │   ├── dashboard\          # /dashboard list, /dashboard/reports/[id] detail
-│   │   │   └── reports\[id]\   # report-views.tsx dispatches on toolName to 5 views
+│   │   │   └── reports\[id]\   # report-views.tsx dispatches on toolName to 6 views
 │   │   │                       # report-views.test.tsx — 36 render tests
 │   │   ├── login\ signup\      # Auth pages
-│   │   ├── tools\              # 5 dedicated tool pages
+│   │   ├── tools\              # 6 dedicated tool pages
+│   │   │   └── ai-readability\ # page.tsx + layout.tsx + opengraph-image.tsx
+│   │   │                       # (each tool\ has layout.tsx for metadata and its own
+│   │   │                       #  opengraph-image.tsx, since pages are client components)
 │   │   ├── layout.tsx          # Root layout and global theme styles
-│   │   ├── page.tsx            # Main tool catalog and search page
+│   │   ├── opengraph-image.tsx # Site-level OG image (rendered at request time via next/og)
+│   │   ├── page.tsx            # Server-rendered tool catalog + search/filter page
 │   │   ├── proxy.ts            # Edge Proxy (formerly middleware)
 │   │   └── site-chrome.tsx     # Navigation header and footer with auth state
 │   ├── components\             # Shared components (SaveReportButton)
+│   │   └── tool-extras.tsx     # FaqSection, RelatedTools, ToolSchema (JSON-LD) for tool pages
 │   ├── db\                     # Drizzle schema (`users`, `savedReports`) & client
 │   ├── lib\                    # Auth wrappers, Supabase client, rate limiting
+│   │   ├── __tests__\          # ai-readability.test.ts, rate-limit.test.ts, seo-analyzer.test.ts
+│   │   ├── ai-readability.ts   # Pure, unit-tested scoring model (11 weighted checks)
+│   │   └── og-image.tsx        # Shared OpenGraph image renderer
 │   ├── instrumentation.ts      # Server Sentry instrumentation
 │   └── instrumentation-client.ts # Client Sentry instrumentation
 ├── tests\
@@ -117,11 +126,12 @@ D:\SiteGPTClone\
 | **Free SEO Report** | Complete | Generates technical summary cards and supports client-side PDF export. |
 | **Content Extractor** | Complete | Extracts DOM-order headings (H1–H3) and word count. |
 | **Sitemap Extractor** | Complete | Queries `robots.txt` and XML sitemaps; handles nested sitemaps. |
-| **Broken Link Checker**| Complete | Scrapes `<a href>`, batch-checks HTTP statuses with fallback to GET. |
+| **Broken Link Checker**| Complete | Scrapes `<a href>`, batch-checks HTTP statuses with fallback to GET. *On branch (not yet merged)*: captures anchor text per link and walks redirect chains manually (`redirect: "manual"`, ≤5 hops, single 8s timeout), exposing `anchorTexts`, `redirects`, `redirectCount` and optional `finalUrl`. |
+| **AI Readability Checker**| Complete | `/tools/ai-readability` + `/api/ai-readability` (Edge). Reports whether the dedicated AI crawlers (GPTBot, ClaudeBot, PerplexityBot and equivalents) can read a page. Scoring lives in `src/lib/ai-readability.ts` — a pure, unit-tested module with 11 weighted checks totalling 100 points. *This score is our own heuristic, not a Google metric or ranking factor*; the tool page states this prominently. |
 | **Auth System** | Complete | Supabase Auth with SSR cookies; abstracted through `src/lib/auth-client.ts`. |
-| **Save Report Feature** | Complete | `SaveReportButton` on all 5 tools; saves JSON payload to database. |
+| **Save Report Feature** | Complete | `SaveReportButton` on all 6 tools; saves JSON payload to database. |
 | **Dashboard** | Complete | Protected by proxy; lists saved reports and supports deletion. |
-| **Saved Report Detail**| Complete | `/dashboard/reports/[id]` dispatches on `toolName` to five per-tool visual views in `report-views.tsx` (SERP preview, score donut, heading outline, URL/status tables), with the raw payload behind a collapsed `<details>`. Covered by 36 render tests. |
+| **Saved Report Detail**| Complete | `/dashboard/reports/[id]` dispatches on `toolName` to six per-tool visual views in `report-views.tsx` (SERP preview, score donut, heading outline, URL/status tables), with the raw payload behind a collapsed `<details>`. Covered by 36 render tests. |
 | **Rate Limiter** | Complete | 20 req/min sliding window via Upstash; in-memory fallback. |
 | **Error Monitoring** | Complete | Optional Sentry setup; inactive if `NEXT_PUBLIC_SENTRY_DSN` is empty. |
 | **SiteGPT Conversational Q&A** | Planned / Unknown | Repository name implies potential AI chat over scraped websites. Not yet started. |
@@ -146,7 +156,16 @@ D:\SiteGPTClone\
    - Server: [`src/lib/auth.ts`](file:///D:/SiteGPTClone/src/lib/auth.ts) (`getCurrentUserId`, `getCurrentUser`, `getSupabaseServerClient`).
 4. **Tool APIs**:
    - All tool scrapers are in [`src/app/api/`](file:///D:/SiteGPTClone/src/app/api/) and declare `export const runtime = "edge"`.
+   - [`src/app/api/ai-readability/route.ts`](file:///D:/SiteGPTClone/src/app/api/ai-readability/route.ts) measures 14 page signals with Cheerio and parses `robots.txt` for 12 known AI crawler tokens. It reports **named agents only** — a `User-agent: *` rule is never attributed to specific bots, and an unfetchable `robots.txt` is not treated as a block.
    - Saved report API is in [`src/app/api/reports/route.ts`](file:///D:/SiteGPTClone/src/app/api/reports/route.ts) and uses `export const runtime = "nodejs"` because Drizzle PostgreSQL client requires Node.js sockets.
+5. **AI Readability Scoring**: [`src/lib/ai-readability.ts`](file:///D:/SiteGPTClone/src/lib/ai-readability.ts)
+   - Pure, unit-tested module (11 weighted checks, 100 points): content in the HTML 20, heading structure 12, structured data 12, title 10, freshness 10, meta description 8, content-to-markup ratio 8, indexable 7, AI crawler access 5, canonical 5, language 3.
+   - Weights follow published AI-citation correlation findings (metadata & freshness r=0.68, semantic HTML r=0.65, structured data r=0.63).
+   - Thresholds were calibrated against live measurements, not guessed: react.dev (1,045 words genuinely in its HTML) and seosnap.xyz (163 words) initially failed the content-to-markup ratio check because modern frameworks ship large inline script payloads. The ratio floor is now 1% (pass at 5%) and the word pass bar 150. Measured results after calibration: seosnap.xyz 85/good, react.dev 80/good, example.com 47/critical, web.telegram.org 39/critical with 0 words.
+6. **Shared Tool-Page Components**: [`src/components/tool-extras.tsx`](file:///D:/SiteGPTClone/src/components/tool-extras.tsx)
+   - `FaqSection` (per-tool FAQ rendered with FAQPage JSON-LD), `RelatedTools` (cross-links between tools), and `ToolSchema` (SoftwareApplication JSON-LD with `isAccessibleForFree: true` and a zero-price Offer).
+   - No `aggregateRating` is emitted anywhere, since the site has no real ratings and inventing them violates Google's structured-data guidelines.
+7. **OpenGraph Imaging**: [`src/lib/og-image.tsx`](file:///D:/SiteGPTClone/src/lib/og-image.tsx) holds the shared renderer; [`src/app/opengraph-image.tsx`](file:///D:/SiteGPTClone/src/app/opengraph-image.tsx) covers the site and each tool route has its own `opengraph-image.tsx`. Generated at request time with `next/og`, not committed as binaries.
 
 ---
 
@@ -210,7 +229,10 @@ Create `.env.local` using the template from `.env.example`:
    `savedReports.userId` is stored as an unconstrained text string rather than a Supabase UUID foreign key, accommodating Clerk user IDs (`user_...`) or any third-party auth ID.
 5. **In-Memory Rate Limit Fallback**:
    To prevent local development friction and maintain high availability during Redis downtime, the rate limiter falls back to an in-memory token bucket if Upstash credentials are missing.
-6. **Defensive Saved-Report Rendering**:
+6. **Server-Rendering Client Components for Discoverability**:
+   The homepage was a `"use client"` component that returned `null` until a `useEffect` ran (`if (!mounted) return null`), so the served HTML was an 11,988-byte shell with no h1, no h2 and no tool catalog. Bing, GPTBot, PerplexityBot and ClaudeBot never run JavaScript, so the page did not exist for them. It is now server-rendered (54,291 bytes with an h1, h2, all six tool cards and a canonical); filtering moved to URL params (`?q=`, `?cat=`) that resolve on the server, so category chips are real links and search is a plain GET form — both work without JavaScript. Note that Googlebot and Bingbot *do* render JavaScript in a second pass, which is why a site can rank well in search and still be invisible to the AI assistants.
+   Related: per-route `metadata` now lives in a `layout.tsx` inside each tool route folder, because all the tool pages are `"use client"` and Next.js only reads metadata exports from server files. Before this, all six pages shared one identical title and description. Each route now has a unique title, description and canonical.
+7. **Defensive Saved-Report Rendering**:
    `savedReports.reportData` is a `jsonb` column, so Drizzle types it as `unknown` and stored rows may predate the current API response shape. Rather than cast, `report-views.tsx` narrows every field through small helpers (`asRecord`, `str`, `num`, `list`) and degrades to an empty state when a field is missing or mistyped. Any field added to a tool's API response must be read the same way. The views are server components — no client state — so the detail page ships no extra JavaScript, and the untruncated payload stays reachable behind a `<details>` element for fields the structured views don't surface.
 
 ---
@@ -226,6 +248,14 @@ Create `.env.local` using the template from `.env.example`:
    Vitest logs a non-fatal warning about `__dirname` in `vitest.config.mts:13:25`.
 4. **Bot Challenges on Heavy WAF Sites**:
    Cheerio cannot execute client-side JavaScript. If a target site strictly requires JavaScript rendering (e.g. Single Page Apps without SSR) or enforces Cloudflare Captchas, the scraper returns an HTTP 403 or empty DOM.
+5. **`/dashboard` Returns 200 with a Client-Side Redirect**:
+   Unauthenticated visitors to `/dashboard` receive an HTTP 200 and a **client-side** redirect to `/login?next=/dashboard`, rather than a server 3xx. `src/proxy.ts` is documented as handling this at the edge, and an edge redirect would show as a 3xx, so the guard may not be firing as documented. The outcome is correct (you do land on `/login?next=/dashboard`) and the page is `noindex`, but a brief flash of the dashboard shell occurs. **Not yet investigated.**
+6. **Opaque-Redirect Fallback Is Unexercised** (branch):
+   In the new link checker, if the runtime returns an opaque redirect (status 0, no readable `Location`), the code falls back to a `redirect: "follow"` request so `ok`/`status` stay correct and the chain is reported as empty. Next's dev edge runtime exposes `Location` for `redirect: "manual"`, so this path has **not** been exercised. Vercel's production isolates may differ — it needs verification on production after deploy.
+7. **`@next/swc-win32-x64-msvc` Fails to Load on the Windows Dev Machine**:
+   `npm run build` logs `Attempted to load @next/swc-win32-x64-msvc ... is not a valid Win32 application` several times before falling back to the WASM compiler. The build still exits 0. Environmental; not a code defect.
+8. **Homepage Fails the Freshness Check — Deliberately Not Fixed**:
+   The homepage carries no date signal, so it fails the AI Readability *freshness* check. This is a deliberate decision, not an oversight: adding a `dateModified` purely to raise a score would fabricate a freshness claim the site does not have — exactly the behaviour this tool criticises in competitors.
 
 ---
 
@@ -240,31 +270,38 @@ Create `.env.local` using the template from `.env.example`:
 
 ## 11. Current Project State & Git Working Tree
 
-- **Branch**: `main` (up to date with `origin/main`).
-- **Recent Git Commits**:
-  - `674be6e`: feat(reports): render saved reports with per-tool visual views
-  - `3d0170a`: chore(lint): ignore tests/scratch/** in ESLint flat config
-  - `a713e4c`: ci: add build step and Playwright E2E job
-  - `462604c`: chore(env): document all env vars in .env.example
-  - `e3d76ef`: feat(monitoring): add optional Sentry error tracking
-- **Working Tree**: Clean apart from `CLAUDE.md` and `.claudeignore`, which remain untracked by choice. The `docs/` handoff files were added in the commit documenting the 2026-10-20 work.
+- **Live Site**: `https://www.seosnap.xyz`, deployed on **Vercel**. The sitemap lists **7 URLs** (homepage + 6 tools). Git integration is now connected: `main` is the production branch and merges auto-deploy. *This was not true before 2026-11-20* — production was manually deployed and had drifted about a month behind `main`. It is fixed now.
+- **Tests**: **106 tests across 4 files** (a month ago this was 7 tests across 2 files). The four files are `src/lib/__tests__/ai-readability.test.ts`, `src/lib/__tests__/rate-limit.test.ts`, `src/lib/__tests__/seo-analyzer.test.ts`, and `src/app/dashboard/reports/[id]/report-views.test.tsx`.
+- **Branch**: `feat/link-context-and-homepage-schema` (link anchor text + redirect chains, and homepage JSON-LD). Committed as `09e0e26` and pushed. **Implemented and verified, NOT yet merged.**
+- **Recent Git Commits** (on `main`):
+  - `a7b1e74`: Merge PR #6 — feat/ai-readability-check
+  - `8aa57af`: feat(ai-readability): add an AI crawler readability checker
+  - `ead0473`: feat(ai-readability): add scoring model and check definitions
+  - `d679042`: Merge PR #5 — feat/discoverability-phase-0
+  - `a8e7bd0`: feat(seo): phase 0 discoverability — server-rendered home, per-page metadata, OG images, FAQ and app schema
+- **Working Tree**: Clean apart from three intentionally untracked files: `CLAUDE.md`, `.claudeignore` and `docs/marketing-strategy.html`. The last is the growth plan — deliberately kept out of version control at the owner's request, so never `git add` it. Its "5 tools / 6 pages" figures predate the AI Readability Checker and are a point-in-time snapshot, not current state.
 
 ---
 
 ## 12. Immediate Next Steps (Ordered by Priority)
 
 > Tasks 1 and 2 from the previous snapshot (ESLint scratch-file ignores, and the structured saved
-> report UI) were completed on 2026-10-20. The remaining work is renumbered below.
+> report UI) were completed on 2026-10-20. Since then, Phase 0 discoverability and the AI Readability
+> Checker shipped. The remaining work, in priority order, is below.
 
 1. **Task 1: Implement Dashboard PDF/CSV Export**
    - File: `src/app/dashboard/reports/[id]/page.tsx`
-   - Goal: Allow users to download saved audits in PDF or CSV formats. A CSV shape must be chosen per tool, since the five saved payloads differ structurally.
-2. **Task 2: Add Unit Tests for API Scraper Logic**
-   - File: `src/lib/__tests__/scraper.test.ts`
-   - Goal: Test Cheerio parsing against static HTML fixture strings to ensure tag extraction resilience. The rendering layer is now covered by 36 tests in `report-views.test.tsx`, but the scrapers themselves remain untested.
-3. **Task 3: Resolve the Vitest `__dirname` Config Warning**
-   - File: `vitest.config.mts:13`
-   - Goal: Replace `__dirname` with `import.meta.dirname` to silence the non-fatal warning and prepare for Vite's `configLoader: 'native'` default.
+   - Goal: Allow users to download saved audits in PDF or CSV formats. A CSV shape must be chosen per tool, since the six saved payloads differ structurally.
+2. **Task 2: Add Unit Tests for the Edge Scraper Logic Itself**
+   - Goal: Test Cheerio parsing against static HTML fixture strings to ensure tag extraction resilience. The rendering layer and the scoring model are tested (`report-views.test.tsx`, `ai-readability.test.ts`), but the scrapers themselves — the `route.ts` handlers — are not.
+3. **Task 3: Phase 2 of the Growth Strategy — Expand the Indexable Surface**
+   - Goal: Grow from 7 pages toward 25–30, one *working* tool or data-backed page at a time. This is explicitly **NOT** a programmatic page farm: Google's scaled-content-abuse policy applies "no matter how it's created", enforcement is silent, and one documented case went from 22,000 indexed pages to 1 overnight.
+4. **Task 4: Phase 3 Distribution**
+   - Goal: Show HN, r/InternetIsBeautiful, r/SideProject. **Explicitly avoid** Product Hunt (featured rate fell from 35.9% in 2022 to 3.2% in 2026; median 1 vote) and the SEO subreddits (r/SEO removes any post containing a link; r/bigseo's rules ban "free tools" by name).
+5. **Task 5: Monitor Search Console for Indexing and First Impressions**
+   - Submission is done — all 7 URLs were submitted for indexing and the sitemap resubmitted on 2026-11-21. The remaining work is monitoring, not submission.
+   - Expect near-zero organic traffic for the first 3 months; that is normal and not a signal of failure. Realistic timings: pages index within days, first long-tail impressions and clicks appear within 1–3 months, and durable rankings only after 6–12 months.
+   - Track **leading indicators, not traffic**: pages indexed, impressions appearing for the new per-page titles, and first long-tail clicks. For context on why patience is required — only 1.74% of newly published pages reach the top 10 within a year, and 72.9% of top-10 pages are over three years old.
 
 ---
 
@@ -281,3 +318,4 @@ Create `.env.local` using the template from `.env.example`:
 1. `UNKNOWN`: Is conversational Q&A / chat over scraped sites (SiteGPT feature) planned for a future release, or should the product focus exclusively on SEO auditing?
 2. `UNKNOWN`: Is there a target date for the Clerk migration, or should Supabase Auth remain the active provider?
 3. `ANSWERED 2026-10-20`: The saved report viewer should render a per-tool visual breakdown resembling the original tool's output, with the raw JSON retained behind a collapsible disclosure. Implemented in `report-views.tsx`.
+4. `ANSWERED 2026-11-21`: Should the indexable surface be expanded via programmatic page generation? **No.** Growth is one *working* tool or data-backed page at a time (Phase 2), because Google's scaled-content-abuse policy applies "no matter how it's created" and enforcement is silent — one documented case went from 22,000 indexed pages to 1 overnight.
