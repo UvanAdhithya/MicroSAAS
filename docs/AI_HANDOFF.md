@@ -2,7 +2,8 @@
 
 > **Audience**: Claude Code CLI (DeepSeek V4.1 Flash / OpenRouter) & future engineering partners.  
 > **Repository Location**: `D:\SiteGPTClone`  
-> **Brand / Live Domain**: SEOSnap (`https://www.seosnap.xyz`, mirror: `https://devtools-lilac-nine.vercel.app`)
+> **Brand / Live Domain**: SEOSnap (`https://www.seosnap.xyz`, mirror: `https://devtools-lilac-nine.vercel.app`)  
+> **Companion documents**: [`DEVELOPMENT_STATUS.md`](DEVELOPMENT_STATUS.md) — verified health and priorities · [`PRODUCT_VISION.md`](PRODUCT_VISION.md) — intent and principles · [`FLAGS_AND_CONCERNS.md`](FLAGS_AND_CONCERNS.md) — open risks, deliberate decisions and known caveats
 
 ---
 
@@ -288,6 +289,13 @@ Create `.env.local` using the template from `.env.example`:
 > Tasks 1 and 2 from the previous snapshot (ESLint scratch-file ignores, and the structured saved
 > report UI) were completed on 2026-10-20. Since then, Phase 0 discoverability and the AI Readability
 > Checker shipped. The remaining work, in priority order, is below.
+>
+> **Do this first, once the current branch merges:** scan a page containing a redirecting link
+> against **production** and confirm the `redirects` array is populated. The link checker's
+> opaque-redirect fallback is unexercised — Next's dev edge runtime exposes `Location` for
+> `redirect: "manual"`, but Vercel's production isolates are a different runtime, so this is the one
+> code path that has been reasoned about rather than observed. Worst case if it differs is empty
+> chains, never a misreported status. See `FLAGS_AND_CONCERNS.md` §1.
 
 1. **Task 1: Implement Dashboard PDF/CSV Export**
    - File: `src/app/dashboard/reports/[id]/page.tsx`
