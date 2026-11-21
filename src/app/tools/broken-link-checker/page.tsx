@@ -19,6 +19,15 @@ interface LinkResult {
   status: number | null;
   ok: boolean;
   error?: string;
+  /** Anchor texts on the scanned page that point at this URL, so a broken
+   *  link can actually be found and fixed. Optional because reports saved
+   *  before this field existed do not carry it. */
+  anchorTexts?: string[];
+  /** Redirect hops followed before the final response. */
+  redirects?: { url: string; status: number; location: string }[];
+  redirectCount?: number;
+  /** Populated only when redirects were followed and the address changed. */
+  finalUrl?: string;
 }
 
 interface ScanResult {
@@ -295,15 +304,38 @@ function ResultsDashboard({
                 {(activeTab === "broken" ? result.broken : result.working).map(
                   (link, i) => (
                     <tr key={i} className="transition-colors hover:bg-[var(--bg-subtle)]">
-                      <td className="max-w-[500px] truncate px-6 py-3 font-mono text-[13px] text-[var(--text)]">
+                      <td className="max-w-[500px] px-6 py-3 font-mono text-[13px] text-[var(--text)]">
                         <a
                           href={link.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="hover:text-[var(--accent)] hover:underline"
+                          className="break-all hover:text-[var(--accent)] hover:underline"
                         >
                           {link.url}
                         </a>
+
+                        {/* Which link on the page this is — the part most
+                            free checkers omit, leaving you with a URL you
+                            cannot locate in your own HTML. */}
+                        {link.anchorTexts && link.anchorTexts.length > 0 && (
+                          <span className="mt-1 block font-sans text-[11px] text-[var(--text-3)]">
+                            Linked as {link.anchorTexts.map((text) => `“${text}”`).join(", ")}
+                          </span>
+                        )}
+
+                        {/* Redirects are shown even for working links: the
+                            hops leak link equity and usually mean a
+                            misconfiguration, which a flattened status hides. */}
+                        {link.redirectCount ? (
+                          <span className="mt-1 block font-sans text-[11px] text-[var(--amber)]">
+                            {link.redirectCount} redirect
+                            {link.redirectCount === 1 ? "" : "s"}
+                            {link.redirects && link.redirects.length > 0
+                              ? ` (${link.redirects.map((hop) => hop.status).join(" → ")})`
+                              : ""}
+                            {link.finalUrl ? ` → ${link.finalUrl}` : ""}
+                          </span>
+                        ) : null}
                       </td>
                       <td className="whitespace-nowrap px-6 py-3 text-right">
                         <StatusBadge link={link} />

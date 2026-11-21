@@ -181,6 +181,59 @@ const CAT_COLOR: Record<string, string> = {
 
 const VALID_CATS: Category[] = ["all", "seo", "data", "audit"];
 
+/* ─── Structured data ───────────────────────────────────── */
+/* The home page emitted no JSON-LD, which our own AI Readability
+ * Checker flags (structured data is one of the strongest signals
+ * correlated with being cited). `@graph` lets the three nodes share
+ * @id references so the organization is declared once.
+ *
+ * The SearchAction is accurate rather than aspirational: this page
+ * filters on `?q=`, so the URL template genuinely resolves. Google
+ * retired the visual sitelinks searchbox, but the markup stays valid
+ * and describes the page truthfully for other consumers. */
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.seosnap.xyz";
+
+const HOME_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "SEOSnap",
+      url: SITE_URL,
+      description:
+        "Free SEO tools that need no signup: an instant SEO audit, a technical SEO report with PDF export, content and sitemap extractors, a broken link checker and an AI readability checker.",
+      inLanguage: "en",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${SITE_URL}/?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "SEOSnap",
+      url: SITE_URL,
+    },
+    {
+      "@type": "ItemList",
+      name: "Free SEO tools",
+      numberOfItems: tools.length,
+      itemListElement: tools.map((tool, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: tool.name,
+        url: `${SITE_URL}/tools/${tool.slug}`,
+      })),
+    },
+  ],
+};
+
 /* ─── Page ───────────────────────────────────────────── */
 export default async function HomePage({
   searchParams,
@@ -202,6 +255,11 @@ export default async function HomePage({
 
   return (
     <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(HOME_JSON_LD) }}
+      />
+
       {/* ── Hero ── */}
       <div style={{ paddingTop: 80, paddingBottom: 72, borderBottom: "1px solid var(--border)", textAlign: "center", minHeight: "45vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
         <p style={{ fontSize: 14, fontFamily: "var(--mono)", color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20 }}>
