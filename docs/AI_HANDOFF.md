@@ -272,14 +272,14 @@ Create `.env.local` using the template from `.env.example`:
 
 - **Live Site**: `https://www.seosnap.xyz`, deployed on **Vercel**. The sitemap lists **7 URLs** (homepage + 6 tools). Git integration is now connected: `main` is the production branch and merges auto-deploy. *This was not true before 2026-11-20* — production was manually deployed and had drifted about a month behind `main`. It is fixed now.
 - **Tests**: **106 tests across 4 files** (a month ago this was 7 tests across 2 files). The four files are `src/lib/__tests__/ai-readability.test.ts`, `src/lib/__tests__/rate-limit.test.ts`, `src/lib/__tests__/seo-analyzer.test.ts`, and `src/app/dashboard/reports/[id]/report-views.test.tsx`.
-- **Branch**: `feat/link-context-and-homepage-schema` (current work — link anchor text + redirect chains, and homepage JSON-LD). **Implemented and verified, NOT yet merged.**
+- **Branch**: `feat/link-context-and-homepage-schema` (link anchor text + redirect chains, and homepage JSON-LD). Committed as `09e0e26` and pushed. **Implemented and verified, NOT yet merged.**
 - **Recent Git Commits** (on `main`):
   - `a7b1e74`: Merge PR #6 — feat/ai-readability-check
   - `8aa57af`: feat(ai-readability): add an AI crawler readability checker
   - `ead0473`: feat(ai-readability): add scoring model and check definitions
   - `d679042`: Merge PR #5 — feat/discoverability-phase-0
   - `a8e7bd0`: feat(seo): phase 0 discoverability — server-rendered home, per-page metadata, OG images, FAQ and app schema
-- **Working Tree**: The branch carries uncommitted modifications to `src/app/api/check-links/route.ts`, `src/app/page.tsx`, `src/app/tools/broken-link-checker/page.tsx` and `src/components/tool-extras.tsx`, plus untracked `CLAUDE.md`, `.claudeignore` and `docs/marketing-strategy.html`.
+- **Working Tree**: Clean apart from three intentionally untracked files: `CLAUDE.md`, `.claudeignore` and `docs/marketing-strategy.html`. The last is the growth plan — deliberately kept out of version control at the owner's request, so never `git add` it. Its "5 tools / 6 pages" figures predate the AI Readability Checker and are a point-in-time snapshot, not current state.
 
 ---
 
