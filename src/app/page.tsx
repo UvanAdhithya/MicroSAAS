@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   // descendant segments, and this page shares the root layout's own segment.
   title: { absolute: "Free SEO Tools for Any Website — SEOSnap" },
   description:
-    "Five free SEO tools that need no signup: instant SEO audit, technical SEO report with PDF export, content outline extractor, sitemap extractor and broken link checker.",
+    "Six free SEO tools that need no signup: instant SEO audit, technical SEO report with PDF export, content outline extractor, sitemap extractor, broken link checker and AI readability checker.",
   alternates: { canonical: "/" },
 };
 
@@ -102,6 +102,27 @@ function BrokenLinkWidget() {
   );
 }
 
+function AiReadabilityWidget() {
+  return (
+    <WidgetShell>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, fontSize: 11, padding: "6px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--bg-subtle)", color: "var(--text-3)", fontFamily: "var(--mono)" }}>https://example.com</div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "white", background: "var(--accent)", borderRadius: 6, padding: "6px 10px" }}>Check</div>
+        </div>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <div style={{ flex: 1, height: 4, borderRadius: 2, background: "var(--green)" }} />
+          <div style={{ fontSize: 10, fontWeight: 600, color: "var(--green)" }}>92/100</div>
+        </div>
+        <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, padding: "5px 8px", fontSize: 10, borderRadius: 6, background: "var(--green-light)", color: "var(--green)", fontWeight: 600, textAlign: "center" }}>In HTML ✓</div>
+          <div style={{ flex: 1, padding: "5px 8px", fontSize: 10, borderRadius: 6, background: "var(--green-light)", color: "var(--green)", fontWeight: 600, textAlign: "center" }}>AI crawlers ✓</div>
+        </div>
+      </div>
+    </WidgetShell>
+  );
+}
+
 function ContentExtractorWidget() {
   return (
     <WidgetShell>
@@ -144,6 +165,7 @@ const tools: Tool[] = [
   { slug: "content-extractor", name: "Content Extractor", description: "Extract heading outlines (H1-H3) and calculate word counts to reverse-engineer competitor content.", category: "data", badge: "new", Widget: ContentExtractorWidget },
   { slug: "sitemap-extractor", name: "Sitemap Extractor", description: "Crawl domains to extract all public URLs from robots.txt and XML sitemaps.", category: "data", badge: "new", Widget: SitemapWidget },
   { slug: "broken-link-checker", name: "Broken Link Checker", description: "Scan any page to find dead links. Checks every href and shows HTTP status codes with export.", category: "audit", badge: "new", Widget: BrokenLinkWidget },
+  { slug: "ai-readability", name: "AI Readability Checker", description: "Check whether AI assistants can actually read a page, or whether JavaScript is hiding the content from them.", category: "audit", badge: "new", Widget: AiReadabilityWidget },
 ];
 
 const CATEGORIES: { id: Category; label: string }[] = [

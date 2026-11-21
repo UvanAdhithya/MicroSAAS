@@ -62,6 +62,13 @@ const ALL_TOOLS: ToolRef[] = [
     description:
       "Scan any page for broken links and see the HTTP status of every URL it points to. Up to 50 links per scan. Free, no signup, no daily limit.",
   },
+  {
+    slug: "ai-readability",
+    name: "AI Readability Checker",
+    blurb: "See whether AI assistants can actually read a page, or whether JavaScript is hiding its content.",
+    description:
+      "Check whether AI assistants can read a page, and score eleven signals — server-rendered content, structured data, freshness and crawler access — that correlate with being cited. Free, no signup.",
+  },
 ];
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.seosnap.xyz";
@@ -179,6 +186,29 @@ const FAQS: Record<string, Faq[]> = {
     {
       q: "Is it free and unlimited?",
       a: "Yes. Free, no signup, and no daily limit on scans.",
+    },
+  ],
+
+  "ai-readability": [
+    {
+      q: "What does the AI Readability Checker actually check?",
+      a: "Eleven signals, all read from the HTML your server returns: how many words of body text are present in the HTML, whether an H1 states the page's subject, how many JSON-LD blocks it carries, its title and meta description, whether it declares a publish or modified date, the ratio of visible text to markup, whether a noindex tag is present, which AI crawlers robots.txt allows, whether a canonical URL is set, and whether the html element declares a language. Each is scored pass, warn or fail and shown with its own weight.",
+    },
+    {
+      q: "Why does it matter that AI crawlers do not run JavaScript?",
+      a: "ChatGPT, Perplexity, Claude and Bing's AI crawlers fetch a URL, read the HTML the server sends back and stop there — they never execute your scripts. If your page builds its content in the browser after load, the document they receive is an empty shell, and the words a visitor sees never reach them. Googlebot is different: it may render the page in a second pass, which is why a site can rank well in Google and still be invisible to assistants. This tool measures that first response.",
+    },
+    {
+      q: "Is this score a Google metric?",
+      a: "No. It is our own heuristic, not a Google metric, a ranking factor, or a figure any search engine or AI provider uses. The weights follow published correlation findings on which page properties appear in AI citations, but the model is ours. Treat it as a guide to what a non-rendering crawler can see, not as a measurement of how you rank.",
+    },
+    {
+      q: "Is blocking AI crawlers in my robots.txt a bad thing?",
+      a: "Not at all, and the tool does not treat it as a fault. Blocking GPTBot, ClaudeBot or others is a legitimate choice with real trade-offs — you may be protecting content or bandwidth, and you are also making it impossible for those assistants to read or cite the page. The tool simply reports which agent tokens are disallowed so you can make that trade-off deliberately rather than by accident.",
+    },
+    {
+      q: "Can it tell me whether an AI assistant cites my site?",
+      a: "No. It cannot see what any assistant says, what it retrieves, or whether it has ever quoted you. Being readable is a precondition for being cited, not a promise of it, and a high score is no guarantee of a single citation. The tool answers one narrower question: is the text of this page present in the HTML a non-rendering crawler receives, and are the signals that correlate with citation in place?",
     },
   ],
 };
